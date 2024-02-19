@@ -1,6 +1,6 @@
 import pytest
 
-from benchmark.constraints.fibonacci_word_count_constraint import FibonacciSequenceConstraint
+from benchmark.constraints.fibonacci_sequence_constraint import FibonacciSequenceConstraint
 from utils.element_type import ElementType
 
 # Test Cases for Words
