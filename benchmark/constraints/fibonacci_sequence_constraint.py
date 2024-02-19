@@ -76,10 +76,15 @@ class FibonacciSequenceConstraint(Constraint):
         """
         element_count = self.count_elements(response)
         if element_count == 0:
+            self.violations.append(f"The response contains no {self.element_type.name.lower()}, which does not satisfy the Fibonacci sequence constraint.")
             return False
 
         # Generating Fibonacci series up to the element count and checking if the count is in the series
         fib_series = [0, 1]
         while fib_series[-1] < element_count:
             fib_series.append(fib_series[-1] + fib_series[-2])
-        return element_count in fib_series
+        if element_count in fib_series:
+            return True
+        else:
+            self.violations.append(f"The number of {self.element_type.name.lower()} in the response ({element_count}) is not a Fibonacci number.")
+            return False
