@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "ifeval"
+version = "0.1.0"
+description = "Used to test various LLM models on IFEval benchmark."
+authors = ["Daniel Gwon <dygwon@gmail.com>"]
+license = "see root license"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+jupyter = "^1.0.0"
+transformers = "^4.38.1"
+torch = "^2.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
