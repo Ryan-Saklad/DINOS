@@ -72,7 +72,7 @@ class ElementCountConstraint(Constraint):
             if self.element:
                 self.violations.append(f"The response contains {element_count} occurrences of '{self.element}', but a minimum of {self.min_count} are required.")
             else:
-                self.violations.append(f"The response contains {element_count} {self.element_type.name.lower()}, but a minimum of {self.min_count} are required.")
+                self.violations.append(f"The count_elementsresponse contains {element_count} {self.element_type.name.lower()}, but a minimum of {self.min_count} are required.")
             return False
         if self.max_count and element_count > self.max_count:
             if self.element:
