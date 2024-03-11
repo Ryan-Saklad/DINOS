@@ -1,4 +1,4 @@
-import os, json, pprint, datetime, csv
+import os, json, pprint, datetime, csv, subprocess
 import requests
 
 from dotenv import load_dotenv
@@ -89,7 +89,7 @@ def save_ifeval_input_data(model: str, prompt_responses: list, model_datetime: s
             }
             print(prompt_response_obj)
             
-            save_file.write(json.dumps(prompt_response) + "\n")
+            save_file.write(json.dumps(prompt_response_obj) + "\n")
     
     return save_filepath
 
@@ -162,14 +162,28 @@ def main():
     prompts = get_base_prompts()
     models = [
         'mistralai/mistral-7b-instruct:nitro',
+        'google/gemma-7b-it:nitro',
+        'mistralai/mixtral-8x7b-instruct:nitro',
+        'huggingfaceh4/zephyr-7b-beta',
     ]
 
     for model in models:
-        model_datetime = datetime.datetime.today().strftime('%F_%T')
+        for runidx in range(3):
+            print(f"{model} run {runidx + 1}")
+            
+            model_datetime = datetime.datetime.today().strftime('%F_%T')
 
-        # input_response_data = get_ifeval_input_data(model, prompts)
-        # saved_file = save_ifeval_input_data(model, input_response_data, model_datetime)
-        save_evaluation_results(model, model_datetime)
+            input_response_data = get_ifeval_input_data(model, prompts)
+            saved_file = save_ifeval_input_data(model, input_response_data, model_datetime)
+
+            subprocess.run([
+                "python", "-m", "instruction_following_eval.evaluation_main",
+                "--input_data=./instruction_following_eval/data/input_data.jsonl",
+                "--input_response_data=" + saved_file,
+                "--output_dir=./instruction_following_eval/data/"
+            ])
+
+            save_evaluation_results(model, model_datetime)
 
 
 if __name__ == '__main__':
