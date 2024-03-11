@@ -180,11 +180,14 @@ def main():
         for runidx in range(3):
             print(f"{model} run {runidx + 1}")
 
+            # separate runs are differentiated by model name and datetime
             model_datetime = datetime.datetime.today().strftime('%F_%T')
 
+            # generate the responses to feed to the evaluation script
             input_response_data = get_ifeval_input_data(model, prompts)
             saved_file = save_ifeval_input_data(model, input_response_data, model_datetime)
 
+            # run the evaluation script
             subprocess.run([
                 "python", "-m", "instruction_following_eval.evaluation_main",
                 "--input_data=./instruction_following_eval/data/input_data.jsonl",
@@ -192,6 +195,7 @@ def main():
                 "--output_dir=./instruction_following_eval/data/"
             ])
 
+            # save the evaluation results for analysis
             save_evaluation_results(model, model_datetime)
 
 
