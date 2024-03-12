@@ -177,12 +177,12 @@ def main():
     models = [
         # 'mistralai/mistral-7b-instruct:nitro',
         # 'google/gemma-7b-it:nitro',
-        'mistralai/mixtral-8x7b-instruct:nitro',
+        # 'mistralai/mixtral-8x7b-instruct:nitro',
         'huggingfaceh4/zephyr-7b-beta',
     ]
 
     for model in models:
-        for runidx in range(3):
+        for runidx in range(2):
             print(f"{model} run {runidx + 1}")
 
             # separate runs are differentiated by model name and datetime
@@ -190,6 +190,7 @@ def main():
 
             # generate the responses to feed to the evaluation script
             input_response_data = get_ifeval_input_data(model, prompts)
+            # TODO save in batches so you don't waste responses
             saved_file = save_ifeval_input_data(model, input_response_data, model_datetime)
 
             # run the evaluation script
