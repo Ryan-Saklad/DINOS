@@ -16,20 +16,22 @@ PROMPTS_PATH = os.path.join(
 def get_llm_response(messages: list, model: str) -> str:
     OPENROUTER_API_KEY = os.environ['OPENROUTER_API_KEY']
 
-    response = requests.post(
-        url="https://openrouter.ai/api/v1/chat/completions",
-        headers={
-            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        },
-        data = json.dumps({
-            "model": model,
-            "messages": messages
-        })
-    )
-
     try:
+        response = requests.post(
+            url="https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            },
+            data = json.dumps({
+                "model": model,
+                "messages": messages
+            })
+        )
+    
         result = response.json()
-    except requests.exceptions.JSONDecodeError as e:
+        
+    # TODO be more specific with potential exceptions
+    except Exception as e:
         print(repr(e))
         return {'error': 'error'}
     
@@ -62,9 +64,13 @@ def get_ifeval_input_data(model: str, prompts: list) -> list:
         # print(messages)
 
         response = {'error': 'error'}
-        while 'error' in response:
+        prompt_count = 0
+        while 'error' in response and prompt_count < 5:
             # keep requesting a response until the rate limit subsides
             response = get_llm_response(messages=messages, model=model)
+
+            # to prevent getting stuck if there are many exceptions
+            prompt_count += 1  
             # print(f"\tResponse: {response}")
 
         prompt_response = {
