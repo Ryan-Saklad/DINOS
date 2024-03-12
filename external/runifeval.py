@@ -27,7 +27,12 @@ def get_llm_response(messages: list, model: str) -> str:
         })
     )
 
-    result = response.json()
+    try:
+        result = response.json()
+    except requests.exceptions.JSONDecodeError as e:
+        print(repr(e))
+        return {'error': 'error'}
+    
     print(f"Response keys: {result.keys()}")
     return result
 
@@ -170,8 +175,8 @@ def save_evaluation_results(model: str, model_datetime: str):
 def main():
     prompts = get_base_prompts()
     models = [
-        'mistralai/mistral-7b-instruct:nitro',
-        'google/gemma-7b-it:nitro',
+        # 'mistralai/mistral-7b-instruct:nitro',
+        # 'google/gemma-7b-it:nitro',
         'mistralai/mixtral-8x7b-instruct:nitro',
         'huggingfaceh4/zephyr-7b-beta',
     ]
