@@ -184,11 +184,11 @@ def main():
         # 'mistralai/mistral-7b-instruct:nitro',
         # 'google/gemma-7b-it:nitro',
         # 'mistralai/mixtral-8x7b-instruct:nitro',
-        'huggingfaceh4/zephyr-7b-beta',
+        # 'huggingfaceh4/zephyr-7b-beta',
     ]
 
     for model in models:
-        for runidx in range(2):
+        for runidx in range(3):
             print(f"{model} run {runidx + 1}")
 
             # separate runs are differentiated by model name and datetime
