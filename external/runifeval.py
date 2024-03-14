@@ -6,11 +6,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+# TODO refactor jsonl read and save operations
 # make sure to update these paths if the relative path
 # to instruction_following_eval/ changes
 DATA_PATH = os.path.join('.', 'instruction_following_eval', 'data')
 PROMPTS_PATH = os.path.join(
     DATA_PATH, 'input_response_data_gpt4_20231107_145030.jsonl')
+NUM_PROMPTS = 541
 
 
 def get_llm_response(messages: list, model: str) -> str:
@@ -39,6 +41,7 @@ def get_llm_response(messages: list, model: str) -> str:
     return result
 
 
+# TODO convert to use input_data.jsonl
 def get_base_prompts(file: str=PROMPTS_PATH) -> list:
     with open(file, mode='r', encoding='utf-8') as jsonl:
         prompts = jsonl.read().splitlines()
@@ -120,6 +123,20 @@ def get_instruction_ids() -> list:
     
     # print(instruction_ids)
     return sorted(instruction_ids)
+
+
+def get_instruction_id_counts() -> dict:
+    input_data_file = os.path.join(DATA_PATH, 'input_data.jsonl')
+    instruction_id_cts = {}
+    with open(input_data_file, mode='r', encoding='utf-8') as f:
+        for jline in f:
+            line = json.loads(jline)
+            instruction_id_list = line['instruction_id_list']
+            for instr_id in instruction_id_list:
+                count = instruction_id_cts.setdefault(instr_id, 0)
+                instruction_id_cts[instr_id] = count + 1
+    
+    return instruction_id_cts
 
 
 def save_evaluation_results(model: str, model_datetime: str):
