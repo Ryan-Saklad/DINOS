@@ -1,6 +1,8 @@
 import os, json, pprint, datetime, csv, subprocess
 import requests
 
+import pandas as pd
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -137,6 +139,20 @@ def get_instruction_id_counts() -> dict:
                 instruction_id_cts[instr_id] = count + 1
     
     return instruction_id_cts
+
+
+def calculate_eval_percentages() -> None:
+    df_results = pd.read_csv(os.path.join(DATA_PATH, 'eval_results.csv'),
+                             encoding='utf-8')
+    df_results_pct = df_results.copy()
+    instr_id_cts = get_instruction_id_counts()
+    df_results_pct['follow_all_instructions'] = \
+        df_results['follow_all_instructions'] / NUM_PROMPTS
+    for instr_id in instr_id_cts:
+        df_results_pct[instr_id] = \
+            df_results[instr_id] / instr_id_cts[instr_id]
+    df_results_pct.to_csv(os.path.join(DATA_PATH, 'eval_results_pct.csv'))
+    
 
 
 def save_evaluation_results(model: str, model_datetime: str):
