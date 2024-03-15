@@ -151,9 +151,14 @@ def calculate_eval_percentages() -> None:
     for instr_id in instr_id_cts:
         df_results_pct[instr_id] = \
             df_results[instr_id] / instr_id_cts[instr_id]
-    df_results_pct.to_csv(os.path.join(DATA_PATH, 'eval_results_pct.csv'))
-    
+    df_results_pct.to_csv(os.path.join(DATA_PATH, 'eval_results_pct.csv'),
+                          index=False)
 
+
+def aggregate_results() -> None:
+    df_results_pct = pd.read_csv(os.path.join(DATA_PATH, 'eval_results_pct.csv'))
+    return df_results_pct
+    
 
 def save_evaluation_results(model: str, model_datetime: str):
     loose_file = os.path.join(DATA_PATH, 'eval_results_loose.jsonl')
