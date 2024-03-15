@@ -158,7 +158,25 @@ def calculate_eval_percentages() -> None:
 def aggregate_results() -> None:
     df_results_pct = pd.read_csv(os.path.join(DATA_PATH, 'eval_results_pct.csv'))
     return df_results_pct
-    
+
+
+# def aggregate_instr_results() -> None:
+#     df_results = pd.read_csv(os.path.join(DATA_PATH, 'eval_results.csv'))
+#     instr_ids = get_instruction_ids()
+#     agg_instr_ids = { instr_id.split(':')[0] for instr_id in instr_ids }
+#     df_agg = pd.DataFrame()
+#     for i, row in df_results.iterrows():
+#         df_agg.loc[i, 'model'] = row['model']
+#         df_agg.loc[i, 'datetime'] = row['datetime']
+#         df_agg.loc[i, 'accuracy'] = row['accuracy']
+#         df_agg.loc[i, 'follow_all_instructions'] = row['follow_all_instructions']
+#         cols = list(row.axes)
+#         for instr in cols:
+#             agg_instr = instr.split(':')[0]
+#             if instr in agg_instr_ids:
+#                 if agg_instr in df_agg.columns:
+#                     df_agg.loc[i, agg_instr] += row[instr]
+
 
 def save_evaluation_results(model: str, model_datetime: str):
     loose_file = os.path.join(DATA_PATH, 'eval_results_loose.jsonl')
