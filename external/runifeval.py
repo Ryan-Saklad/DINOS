@@ -88,13 +88,17 @@ def get_ifeval_input_data(model: str, prompts: list) -> list:
 
 
 def save_ifeval_input_data(
-        model: str, prompt_responses: list, model_datetime: str) -> str:
+        model: str,
+        prompt_responses:
+        list, model_datetime: str,
+        runidx: int=0) -> str:
     # saved files are differentiated by model and date
     model_name = model.split('/')[-1]
     filename = '_'.join([
         'input_response_data',
         model_name,
-        model_datetime]) + '.jsonl'
+        model_datetime,
+        str(runidx)]) + '.jsonl'
     save_filepath = os.path.join(DATA_PATH, filename)
 
     with open(save_filepath, mode='w', encoding='utf-8') as save_file:
@@ -248,12 +252,12 @@ def main():
             print(f"{model} run {runidx + 1}")
 
             # separate runs are differentiated by model name and datetime
-            model_datetime = datetime.datetime.today().strftime('%F_%T')
+            model_datetime = datetime.datetime.today().strftime('%F')
 
             # generate the responses to feed to the evaluation script
             input_response_data = get_ifeval_input_data(model, prompts)
             # TODO save in batches so you don't waste responses
-            saved_file = save_ifeval_input_data(model, input_response_data, model_datetime)
+            saved_file = save_ifeval_input_data(model, input_response_data, model_datetime, runidx)
 
             # run the evaluation script
             subprocess.run([
