@@ -1,34 +1,49 @@
-import os, json, pprint, datetime, csv
+import os, json, pprint, datetime, csv, subprocess
 import requests
+
+import pandas as pd
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
+# TODO refactor jsonl read and save operations
+# make sure to update these paths if the relative path
+# to instruction_following_eval/ changes
+DATA_PATH = os.path.join('.', 'instruction_following_eval', 'data')
 PROMPTS_PATH = os.path.join(
-    '.', 'instruction_following_eval', 'data', 'input_response_data_gpt4_20231107_145030.jsonl')
+    DATA_PATH, 'input_response_data_gpt4_20231107_145030.jsonl')
+NUM_PROMPTS = 541
 
 
 def get_llm_response(messages: list, model: str) -> str:
     OPENROUTER_API_KEY = os.environ['OPENROUTER_API_KEY']
 
-    response = requests.post(
-        url="https://openrouter.ai/api/v1/chat/completions",
-        headers={
-            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        },
-        data = json.dumps({
-            "model": model,
-            "messages": messages
-        })
-    )
-
-    result = response.json()
+    try:
+        response = requests.post(
+            url="https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            },
+            data = json.dumps({
+                "model": model,
+                "messages": messages
+            })
+        )
+    
+        result = response.json()
+        
+    # TODO be more specific with potential exceptions
+    except Exception as e:
+        print(repr(e))
+        return {'error': 'error'}
+    
     print(f"Response keys: {result.keys()}")
     return result
 
 
+# TODO convert to use input_data.jsonl
 def get_base_prompts(file: str=PROMPTS_PATH) -> list:
     with open(file, mode='r', encoding='utf-8') as jsonl:
         prompts = jsonl.read().splitlines()
@@ -54,9 +69,13 @@ def get_ifeval_input_data(model: str, prompts: list) -> list:
         # print(messages)
 
         response = {'error': 'error'}
-        while 'error' in response:
+        prompt_count = 0
+        while 'error' in response and prompt_count < 5:
             # keep requesting a response until the rate limit subsides
             response = get_llm_response(messages=messages, model=model)
+
+            # to prevent getting stuck if there are many exceptions
+            prompt_count += 1  
             # print(f"\tResponse: {response}")
 
         prompt_response = {
@@ -68,15 +87,19 @@ def get_ifeval_input_data(model: str, prompts: list) -> list:
     return prompt_response_list
 
 
-def save_ifeval_input_data(model: str, prompt_responses: list, model_datetime: str) -> str:
+def save_ifeval_input_data(
+        model: str,
+        prompt_responses:
+        list, model_datetime: str,
+        runidx: int=0) -> str:
     # saved files are differentiated by model and date
     model_name = model.split('/')[-1]
     filename = '_'.join([
         'input_response_data',
         model_name,
-        model_datetime]) + '.jsonl'
-    save_filepath = os.path.join(
-        '.', 'instruction_following_eval', 'data', filename)
+        model_datetime,
+        str(runidx)]) + '.jsonl'
+    save_filepath = os.path.join(DATA_PATH, filename)
 
     with open(save_filepath, mode='w', encoding='utf-8') as save_file:
         for prompt_response in prompt_responses:
@@ -89,13 +112,13 @@ def save_ifeval_input_data(model: str, prompt_responses: list, model_datetime: s
             }
             print(prompt_response_obj)
             
-            save_file.write(json.dumps(prompt_response) + "\n")
+            save_file.write(json.dumps(prompt_response_obj) + "\n")
     
     return save_filepath
 
 
 def get_instruction_ids() -> list:
-    input_data_file = os.path.join('.', 'instruction_following_eval', 'data', 'input_data.jsonl')
+    input_data_file = os.path.join(DATA_PATH, 'input_data.jsonl')
 
     instruction_ids = set()
     with open(input_data_file, mode='r', encoding='utf-8') as f:
@@ -108,11 +131,61 @@ def get_instruction_ids() -> list:
     return sorted(instruction_ids)
 
 
+def get_instruction_id_counts() -> dict:
+    input_data_file = os.path.join(DATA_PATH, 'input_data.jsonl')
+    instruction_id_cts = {}
+    with open(input_data_file, mode='r', encoding='utf-8') as f:
+        for jline in f:
+            line = json.loads(jline)
+            instruction_id_list = line['instruction_id_list']
+            for instr_id in instruction_id_list:
+                count = instruction_id_cts.setdefault(instr_id, 0)
+                instruction_id_cts[instr_id] = count + 1
+    
+    return instruction_id_cts
+
+
+def calculate_eval_percentages() -> None:
+    df_results = pd.read_csv(os.path.join(DATA_PATH, 'eval_results.csv'),
+                             encoding='utf-8')
+    df_results_pct = df_results.copy()
+    instr_id_cts = get_instruction_id_counts()
+    df_results_pct['follow_all_instructions'] = \
+        df_results['follow_all_instructions'] / NUM_PROMPTS
+    for instr_id in instr_id_cts:
+        df_results_pct[instr_id] = \
+            df_results[instr_id] / instr_id_cts[instr_id]
+    df_results_pct.to_csv(os.path.join(DATA_PATH, 'eval_results_pct.csv'),
+                          index=False)
+
+
+def aggregate_results() -> None:
+    df_results_pct = pd.read_csv(os.path.join(DATA_PATH, 'eval_results_pct.csv'))
+    return df_results_pct
+
+
+# def aggregate_instr_results() -> None:
+#     df_results = pd.read_csv(os.path.join(DATA_PATH, 'eval_results.csv'))
+#     instr_ids = get_instruction_ids()
+#     agg_instr_ids = { instr_id.split(':')[0] for instr_id in instr_ids }
+#     df_agg = pd.DataFrame()
+#     for i, row in df_results.iterrows():
+#         df_agg.loc[i, 'model'] = row['model']
+#         df_agg.loc[i, 'datetime'] = row['datetime']
+#         df_agg.loc[i, 'accuracy'] = row['accuracy']
+#         df_agg.loc[i, 'follow_all_instructions'] = row['follow_all_instructions']
+#         cols = list(row.axes)
+#         for instr in cols:
+#             agg_instr = instr.split(':')[0]
+#             if instr in agg_instr_ids:
+#                 if agg_instr in df_agg.columns:
+#                     df_agg.loc[i, agg_instr] += row[instr]
+
+
 def save_evaluation_results(model: str, model_datetime: str):
-    data_path = os.path.join('.', 'instruction_following_eval', 'data')
-    loose_file = os.path.join(data_path, 'eval_results_loose.jsonl')
-    strict_file = os.path.join(data_path, 'eval_results_strict.jsonl')
-    eval_results_file = os.path.join(data_path, 'eval_results.csv')
+    loose_file = os.path.join(DATA_PATH, 'eval_results_loose.jsonl')
+    strict_file = os.path.join(DATA_PATH, 'eval_results_strict.jsonl')
+    eval_results_file = os.path.join(DATA_PATH, 'eval_results.csv')
     all_instruction_ids = get_instruction_ids()
 
     # pull all true from evaluation categories
@@ -135,23 +208,30 @@ def save_evaluation_results(model: str, model_datetime: str):
                 # record results at the instruction level
                 inst_results = jline["follow_instruction_list"]
                 line_instruction_ids = jline["instruction_id_list"]
-                for instruction_id, result in zip(line_instruction_ids, inst_results):
+                for instruction_id, result in zip(
+                    line_instruction_ids, inst_results):
                     # print(instruction_id, result)
                     if result:
                         eval_dict[instruction_id] += 1
 
         # store the results for this model and accuracy in a csv file
         need_header = False if os.path.exists(eval_results_file) else True
-        with open(eval_results_file, mode='a', encoding='utf-8', newline='') as csvfile:
+        with open(eval_results_file, mode='a',
+                  encoding='utf-8', newline='') as csvfile:
             eval_results_writer = csv.writer(csvfile)
 
             if need_header:
-                header_row = ['model', 'datetime', 'accuracy', 'follow_all_instructions'] + all_instruction_ids
+                header_row = ['model',
+                              'datetime',
+                              'accuracy',
+                              'follow_all_instructions'] + all_instruction_ids
                 eval_results_writer.writerow(header_row)
 
             # records the results
-            results_row = [eval_dict["model"], eval_dict["datetime"],
-                           eval_dict["accuracy"], eval_dict["follow_all_instructions"]]
+            results_row = [eval_dict["model"],
+                           eval_dict["datetime"],
+                           eval_dict["accuracy"],
+                           eval_dict["follow_all_instructions"]]
             # record the results for each instruction id
             for instruction_id in all_instruction_ids:
                 results_row.append(eval_dict[instruction_id])
@@ -161,15 +241,34 @@ def save_evaluation_results(model: str, model_datetime: str):
 def main():
     prompts = get_base_prompts()
     models = [
-        'mistralai/mistral-7b-instruct:nitro',
+        # 'mistralai/mistral-7b-instruct:nitro',
+        # 'google/gemma-7b-it:nitro',
+        # 'mistralai/mixtral-8x7b-instruct:nitro',
+        # 'huggingfaceh4/zephyr-7b-beta',
     ]
 
     for model in models:
-        model_datetime = datetime.datetime.today().strftime('%F_%T')
+        for runidx in range(3):
+            print(f"{model} run {runidx + 1}")
 
-        # input_response_data = get_ifeval_input_data(model, prompts)
-        # saved_file = save_ifeval_input_data(model, input_response_data, model_datetime)
-        save_evaluation_results(model, model_datetime)
+            # separate runs are differentiated by model name and datetime
+            model_datetime = datetime.datetime.today().strftime('%F')
+
+            # generate the responses to feed to the evaluation script
+            input_response_data = get_ifeval_input_data(model, prompts)
+            # TODO save in batches so you don't waste responses
+            saved_file = save_ifeval_input_data(model, input_response_data, model_datetime, runidx)
+
+            # run the evaluation script
+            subprocess.run([
+                "python", "-m", "instruction_following_eval.evaluation_main",
+                "--input_data=./instruction_following_eval/data/input_data.jsonl",
+                "--input_response_data=" + saved_file,
+                "--output_dir=./instruction_following_eval/data/"
+            ])
+
+            # save the evaluation results for analysis
+            save_evaluation_results(model, model_datetime)
 
 
 if __name__ == '__main__':
