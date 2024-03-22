@@ -1,20 +1,23 @@
-from benchmark.constraints.element_count_constraint import ElementCountConstraint
-from benchmark.constraints.element_frequency_constraint import ElementFrequencyConstraint
-from benchmark.constraints.element_length_pattern_constraint import ElementLengthPatternConstraint
-from benchmark.constraints.element_repetition_constraint import ElementRepetitionConstraint
-from benchmark.constraints.fibonacci_sequence_constraint import FibonacciSequenceConstraint
-
-from utils.element_type import ElementType
 import random
 
-element_types = [ElementType.WORDS, ElementType.CHARACTERS, ElementType.SENTENCES, ElementType.PARAGRAPHS]
-def gather_constraints(seed, list_of_constraints) : 
+def randomizer() : 
+    # Return a random number between 0 and 1
+    return random.uniform(0, 1)
+
+def set_seed(seed = 42) : 
+    random.seed(seed)
+
+def gather_constraints(list_of_constraints, seed = None) :
+    '''
+    This function randomly selects constraints to add to the list of constraints
+    list_of_constraints : list of constraints to choose from
+    seed : seed for random number generator, this is for a single run, if you want to run multiple times, you also need to have an external seed via the function set_seed(seed)
+    ''' 
     constraints = []
-    def randomizer(seed) : 
-        random.seed(seed)
-        # Return a random number between 0 and 1
-        return random.uniform(0, 1)
+    if seed : # Single run seed for random number generator, multiple runs will require an external seed
+        set_seed(seed)
     # Randomly select constraints to add
-    for constraint in list_of_constraints:
-        if randomizer(seed) > 0.5:
+    for constraint in list_of_constraints : 
+        if randomizer() > 0.5 : 
             constraints.append(constraint)
+    return constraints
