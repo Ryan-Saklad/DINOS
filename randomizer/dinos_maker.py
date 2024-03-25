@@ -12,8 +12,14 @@ initial_constraints = [ElementCountConstraint, ElementFrequencyConstraint, Eleme
 element_types = [ElementType.WORDS, ElementType.CHARACTERS, ElementType.SENTENCES, ElementType.PARAGRAPHS]
 count_type = ["exact_count", "range_count"]
 case_sensitive = [True, False]
-random_word_list = ["apple", "book", "desk", "pen", "cat", "dog", "tree", "house", "car", "phone",
-             "computer", "laptop", "keyboard", "mouse", "chair", "table", "door", "window", "wall", "floor"]
+random_word_list = [
+    "house", "run", "book", "jump", "car", "sing", "dog", "play",
+    "ball", "write", "bike", "read", "cat", "swim", "tree", "eat",
+    "friend", "talk", "school", "draw", "sun", "dance", "game", "cook",
+    "bird", "walk", "sleep", "work", "flower", "love", "help", "laugh",
+    "music", "watch", "story", "build", "rain", "learn", "smile", "grow",
+    "water", "think", "ride", "color", "dream", "see" 
+]
 char_list = [chr(i) for i in range(97, 123)]
 topics = [
     "vegetables", "cheese", "banking", "hammocks", "basketball", 
