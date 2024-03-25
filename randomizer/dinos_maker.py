@@ -15,8 +15,31 @@ case_sensitive = [True, False]
 random_word_list = ["apple", "book", "desk", "pen", "cat", "dog", "tree", "house", "car", "phone",
              "computer", "laptop", "keyboard", "mouse", "chair", "table", "door", "window", "wall", "floor"]
 char_list = [chr(i) for i in range(97, 123)]
+topics = [
+    "vegetables", "cheese", "banking", "hammocks", "basketball", 
+    "games", "meteorology", "tattoos", "barbers", "pork", 
+    "coffin", "farmers markets", "weaving", "Central America", 
+    "dentistry", "post office", "alligators", "boats", "pineapple", 
+    "royalty", "windmills", "cotton", "playing cards", "seashells", 
+    "flood", "giants", "Disney movies", "money", "military", 
+    "shipwrecks", "postcards", "coins", "gorillas", "camels", 
+    "firemen", "veterinarians", "athletics", "banana", "slavery", 
+    "sailing", "football", "pipe organs", "communism", "Africa",
+    "skull", "vaccines", "accordions", "beekeeping", "cats", 
+    "paper boys", "balloons", "potatoes", "bears", "spinning", 
+    "magicians", "World War 1", "Europe", "buffaloes", "smoking",
+    "Salvation Army", "criminals", "pipes", "spas", "bread", 
+    "Red Cross", "insects", "zeppelins", "drugstores", "South America",
+    "parachuting", "shells", "giraffes", "baseball", "frogs", 
+    "boxing", "lions", "motorcycles", "sewing machines", "hunting", 
+    "earthquake", "pottery", "printing", "masonry", "justice", 
+    "rice", "mountaineering", "pilots", "hotels", "music", 
+    "fencing", "bridges", "rugby", "journalism", "shoes", 
+    "snakes", "engineering", "horses", "cards", "spiritism", "cemetery"
+]
 
-def make_prompts(seed, list_of_prompts = [], num_prompts = 1) : 
+
+def make_prompts(seed, num_prompts = 1, topic = False) : 
     constraint_gatherer.set_seed(seed)
     prompts = []
     for num_runs in range(num_prompts) : 
@@ -92,9 +115,10 @@ def make_prompts(seed, list_of_prompts = [], num_prompts = 1) :
                 element_type = random.choice(element_types)
                 current_constraint = FibonacciSequenceConstraint(element_type)
             single_run_prompts.append(current_constraint)
-        q = question.Question(constraints= single_run_prompts)
+        if topic : 
+            q = question.Question(constraints= single_run_prompts, topic = random.choice(topics))
+        else : 
+            q = question.Question(constraints= single_run_prompts)
         q.generate_prompt()
         prompts.append(q.prompt)
     return prompts
-
-print(make_prompts(42, num_prompts = 5)[1])
