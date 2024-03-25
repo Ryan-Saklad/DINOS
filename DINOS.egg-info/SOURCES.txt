@@ -16,6 +16,12 @@ benchmark/constraints/element_repetition_constraint.py
 benchmark/constraints/fibonacci_sequence_constraint.py
 randomizer/__init__.py
 randomizer/constraint_gatherer.py
+randomizer/dinos_maker.py
+tests/test_element_count_constraint.py
+tests/test_element_frequency_constraint.py
+tests/test_element_length_pattern_constraint.py
+tests/test_element_repetition_constraint.py
+tests/test_fibonacci_sequence_constraint.py
 utils/__init__.py
 utils/count_elements.py
 utils/element_type.py

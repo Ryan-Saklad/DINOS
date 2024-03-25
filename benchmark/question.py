@@ -2,13 +2,14 @@ from benchmark.constraints.constraint import Constraint
 
 
 class Question:
-    def __init__(self, prompt: str = "", constraints: list[Constraint] = None):
+    def __init__(self, prompt: str = "", constraints: list[Constraint] = None, topic = "Anything"):
         self.prompt: str = prompt  # The question prompt
         self.constraints: list[Constraint] = constraints if constraints is not None else []  # Constraints the response must satisfy
+        self.topic = topic # The topic of the question
 
     def generate_prompt(self) -> None:
         task_descriptions: list[str] = [constraint.description for constraint in self.constraints]
-        self.prompt = "Please generate a response that satisfies the following constraints: " + "; ".join(task_descriptions)
+        self.prompt = "Please generate a response that satisfies the following constraints: " + "Topic: {topic}".format(topic = self.topic) + "; " + "; ".join(task_descriptions)
 
     def evaluate_response(self, response: str) -> tuple[bool, list[str]]:
         # Evaluate the LLM's response against the constraints
