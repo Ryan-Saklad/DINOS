@@ -17,6 +17,6 @@ def run_prompt_generator(args) :
     prompts = dinos_maker.make_prompts(args.seed, args.num_prompts, args.topic)
     # Save the prompts to a csv file
     df = pd.DataFrame(prompts, columns = ['Prompt'])
-    df.to_csv('random_prompts.csv', index = False)
+    df.to_csv(args.output , index = False)
 
 run_prompt_generator(args)
