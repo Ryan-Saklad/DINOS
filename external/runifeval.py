@@ -13,8 +13,15 @@ load_dotenv()
 # to instruction_following_eval/ changes
 DATA_PATH = os.path.join('.', 'instruction_following_eval', 'data')
 PROMPTS_PATH = os.path.join(
-    DATA_PATH, 'input_response_data_gpt4_20231107_145030.jsonl')
+    DATA_PATH, 'input_data.jsonl')
 NUM_PROMPTS = 541
+
+
+def read_jsonl(path: str) -> list:
+    with open(path, 'r', encoding='utf-8') as f:
+        jsonl = f.read().splitlines()
+        jlines = [json.loads(jline) for jline in jsonl]
+        return jlines
 
 
 def get_llm_response(messages: list, model: str) -> str:
@@ -44,18 +51,21 @@ def get_llm_response(messages: list, model: str) -> str:
 
 
 # TODO convert to use input_data.jsonl
-def get_base_prompts(file: str=PROMPTS_PATH) -> list:
-    with open(file, mode='r', encoding='utf-8') as jsonl:
-        prompts = jsonl.read().splitlines()
-        # print(prompts)
+def get_input_data(file: str = PROMPTS_PATH) -> list:
+    input_data = read_jsonl(file)
+    return input_data
 
-        return_list = []
-        for jline in prompts:
-            return_dict = json.loads(jline)
-            del return_dict['response']
-            return_list.append(return_dict)
-
-        return return_list
+    # with open(file, mode='r', encoding='utf-8') as jsonl:
+    #     prompts = jsonl.read().splitlines()
+    #     # print(prompts)
+    #
+    #     return_list = []
+    #     for jline in prompts:
+    #         return_dict = json.loads(jline)
+    #         del return_dict['response']
+    #         return_list.append(return_dict)
+    #
+    #     return return_list
     
 
 def get_ifeval_input_data(model: str, prompts: list) -> list:
@@ -239,36 +249,38 @@ def save_evaluation_results(model: str, model_datetime: str):
 
 
 def main():
-    prompts = get_base_prompts()
-    models = [
-        # 'mistralai/mistral-7b-instruct:nitro',
-        # 'google/gemma-7b-it:nitro',
-        # 'mistralai/mixtral-8x7b-instruct:nitro',
-        # 'huggingfaceh4/zephyr-7b-beta',
-    ]
-
-    for model in models:
-        for runidx in range(3):
-            print(f"{model} run {runidx + 1}")
-
-            # separate runs are differentiated by model name and datetime
-            model_datetime = datetime.datetime.today().strftime('%F')
-
-            # generate the responses to feed to the evaluation script
-            input_response_data = get_ifeval_input_data(model, prompts)
-            # TODO save in batches so you don't waste responses
-            saved_file = save_ifeval_input_data(model, input_response_data, model_datetime, runidx)
-
-            # run the evaluation script
-            subprocess.run([
-                "python", "-m", "instruction_following_eval.evaluation_main",
-                "--input_data=./instruction_following_eval/data/input_data.jsonl",
-                "--input_response_data=" + saved_file,
-                "--output_dir=./instruction_following_eval/data/"
-            ])
-
-            # save the evaluation results for analysis
-            save_evaluation_results(model, model_datetime)
+    input_data = get_input_data(PROMPTS_PATH)
+    # models = [
+    #     # 'mistralai/mistral-7b-instruct:nitro',
+    #     # 'google/gemma-7b-it:nitro',
+    #     # 'mistralai/mixtral-8x7b-instruct:nitro',
+    #     # 'huggingfaceh4/zephyr-7b-beta',
+    #     'perplexity/sonar-small-chat',
+    #     'perplexity/sonar-small-online'
+    # ]
+    #
+    # for model in models:
+    #     for runidx in range(3):
+    #         print(f"{model} run {runidx + 1}")
+    #
+    #         # separate runs are differentiated by model name and datetime
+    #         model_datetime = datetime.datetime.today().strftime('%F')
+    #
+    #         # generate the responses to feed to the evaluation script
+    #         input_response_data = get_ifeval_input_data(model, prompts)
+    #         # TODO save in batches so you don't waste responses
+    #         saved_file = save_ifeval_input_data(model, input_response_data, model_datetime, runidx)
+    #
+    #         # run the evaluation script
+    #         subprocess.run([
+    #             "python", "-m", "instruction_following_eval.evaluation_main",
+    #             "--input_data=./instruction_following_eval/data/input_data.jsonl",
+    #             "--input_response_data=" + saved_file,
+    #             "--output_dir=./instruction_following_eval/data/"
+    #         ])
+    #
+    #         # save the evaluation results for analysis
+    #         save_evaluation_results(model, model_datetime)
 
 
 if __name__ == '__main__':
