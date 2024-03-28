@@ -48,6 +48,7 @@ topics = [
 def make_prompts(seed, num_prompts = 1, topic = False) : 
     constraint_gatherer.set_seed(seed)
     prompts = []
+    prompts_object = []
     for num_runs in range(num_prompts) : 
         constraints = constraint_gatherer.gather_constraints(initial_constraints)
         single_run_prompts = []
@@ -127,4 +128,5 @@ def make_prompts(seed, num_prompts = 1, topic = False) :
             q = question.Question(constraints= single_run_prompts)
         q.generate_prompt()
         prompts.append(q.prompt)
-    return prompts
+        prompts_object.append(q)
+    return prompts, prompts_object

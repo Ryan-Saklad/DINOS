@@ -14,9 +14,13 @@ def run_prompt_generator(args) :
     Run the prompt generator
     args : arguments from the command line    
     '''
-    prompts = dinos_maker.make_prompts(args.seed, args.num_prompts, args.topic)
+    prompts, objects = dinos_maker.make_prompts(args.seed, args.num_prompts, args.topic)
     # Save the prompts to a csv file
     df = pd.DataFrame(prompts, columns = ['Prompt'])
     df.to_csv(args.output , index = False)
-
+    print("Prompts saved to", args.output)
+    import pickle
+    with open(args.output.replace('.csv', '.pkl'), 'wb') as f:
+        pickle.dump(objects, f)
+    print("Objects saved to", args.output.replace('.csv', '.pkl'))
 run_prompt_generator(args)
