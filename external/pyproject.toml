@@ -15,6 +15,7 @@ langdetect = "^1.0.9"
 immutabledict = "^4.2.0"
 pandas = "^2.2.1"
 matplotlib = "^3.8.3"
+requests = "^2.31.0"
 
 
 [build-system]
