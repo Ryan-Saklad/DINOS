@@ -1,0 +1,11 @@
+Correctness,Violated Constraints
+False,"[""The response contains 5 occurrences of 'z', but a minimum of 62 are required."", ""The frequency of 'school' in the response is 0.00%, but a minimum of 9.0% is required."", 'The number of characters in the response (908) is not a Fibonacci number.']"
+False,"['The lengths of sentences within a paragraphs are not strictly in decreasing order with a minimum length difference of 1.', ""The character 'c' is repeated less than 86 time(s) within a paragraph.""]"
+False,['The lengths of words within a sentences are not strictly in increasing order with a minimum length difference of 1.']
+False,"[""The response contains 112 occurrences of 'd', but exactly 38 are required."", ""The frequency of 'story' in the response is 0.32%, but a minimum of 80.0% is required.""]"
+False,"[""The frequency of 'read' in the response is 0.00%, but a minimum of 98.0% is required."", ""The word 'car' is repeated less than 5 time(s) within a sentence.""]"
+False,"[""The response contains 3 occurrences of 'q', but a minimum of 28 are required."", 'The lengths of words within a paragraphs are not strictly in increasing order with a minimum length difference of 1.', 'The number of sentences in the response (25) is not a Fibonacci number.']"
+False,"[""The response contains 3 occurrences of 'dance', but exactly 8 are required."", 'The lengths of words within a sentences are not strictly in increasing order with a minimum length difference of 41.']"
+False,"[""The response contains 4 occurrences of 'walk', but exactly 15 are required."", ""The frequency of 'cat' in the response is 0.02%, but a minimum of 18.0% is required."", 'The lengths of words within a sentences are not strictly in decreasing order with a minimum length difference of 17.', 'The number of words in the response (240) is not a Fibonacci number.']"
+False,"[""The frequency of 'smile' in the response is 0.02%, but a minimum of 99.0% is required."", 'The number of sentences in the response (17) is not a Fibonacci number.']"
+False,"[""The frequency of 'jump' in the response is 0.01%, but a minimum of 16.0% is required."", 'The lengths of words within a paragraphs are not strictly in increasing order with a minimum length difference of 1.', ""The word 'rain' is repeated less than 50 time(s) within a paragraph.""]"

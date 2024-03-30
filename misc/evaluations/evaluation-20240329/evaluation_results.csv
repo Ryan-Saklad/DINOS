@@ -1,0 +1,11 @@
+Correctness,Violated Constraints
+False,"[""The response contains 1 occurrences of 'z', but a minimum of 62 are required."", ""The frequency of 'school' in the response is 0.00%, but a minimum of 9.0% is required."", 'The number of characters in the response (1022) is not a Fibonacci number.']"
+False,"['The lengths of sentences within a paragraphs are not strictly in decreasing order with a minimum length difference of 14.', 'The number of paragraphs in the response (7) is not a Fibonacci number.']"
+False,"[""The response contains 21 occurrences of 'w', but a minimum of 86 are required."", 'The lengths of sentences within a paragraphs are not strictly in increasing order with a minimum length difference of 46.', ""The character 'g' is repeated less than 19 time(s) within a paragraph.""]"
+False,"[""The character 'j' is repeated more than 84 time(s) within a paragraph."", 'The number of sentences in the response (734) is not a Fibonacci number.']"
+False,"[""The frequency of 'book' in the response is 0.00%, but a minimum of 66.0% is required.""]"
+False,"[""The response contains 26 occurrences of 'w', but a minimum of 67 are required."", 'The lengths of words within a paragraphs are not strictly in increasing order with a minimum length difference of 1.', ""The word 'cat' is repeated less than 29 time(s) within a sentence."", 'The number of sentences in the response (18) is not a Fibonacci number.']"
+False,"[""The frequency of 'rain' in the response is 0.02%, but a minimum of 94.0% is required."", 'The number of words in the response (122) is not a Fibonacci number.']"
+False,"[""The response contains 0 occurrences of 'book', but a minimum of 25 are required."", ""The frequency of 'swim' in the response is 0.36%, but a minimum of 6.0% is required."", 'The lengths of words within a paragraphs are not strictly in increasing order with a minimum length difference of 1.']"
+False,['The number of paragraphs in the response (6) is not a Fibonacci number.']
+False,"[""The frequency of 'jump' in the response is 0.00%, but a minimum of 16.0% is required."", ""The character 't' is repeated less than 88 time(s) within a paragraph."", 'The number of paragraphs in the response (6) is not a Fibonacci number.']"
