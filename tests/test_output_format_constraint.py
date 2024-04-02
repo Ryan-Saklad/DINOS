@@ -1,3 +1,4 @@
+import datetime
 import pytest
 
 from benchmark.constraints.output_format_constraint import OutputFormatConstraint
@@ -42,7 +43,13 @@ def test_json(text, expected):
 
 
 @pytest.mark.parametrize("text, expected", [
-    ('{ "hello": "world" }', False),
+    ("hello: world: foo", False),  # must be a key: value pair
+    ("hello: world", True),
+    ("hello:\n\t- foo\n\t- bar", False),  # can't use tabs as whitespace
+    ("hello:\n- foo\n- bar", True),
+    ("1: hello", True),
+    ("hello: [foo, bar, 2.0, 3e10, 0xC, 0o14]\nworld:\n  - leggo\n  - myeggo", True),  # additional data types
+    (f"hello: {datetime.datetime.now()}", True)
 ])
 def test_yaml(text, expected):
     constraint = OutputFormatConstraint(OutputType.YAML)
