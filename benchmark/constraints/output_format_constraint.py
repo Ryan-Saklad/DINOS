@@ -1,6 +1,8 @@
 from benchmark.constraints.constraint import Constraint
 from utils.output_type import OutputType
 
+import json
+
 
 class OutputFormatConstraint(Constraint):
     def __init__(self, output_type: OutputType):
@@ -30,5 +32,18 @@ class OutputFormatConstraint(Constraint):
         Returns:
             bool: True if the response matches the expected output format, False otherwise.
         """
-        pass
+        match self.output_type:
+            case OutputType.JSON:
+                try:
+                    json.loads(response)
+                except json.decoder.JSONDecodeError:
+                    self.violations.append("The response is not a valid json format.")
+                    return False
+            case OutputType.YAML:
+                return False
+            case OutputType.XML:
+                return False
+            case OutputType.TEXT:
+                return False
 
+        return True
