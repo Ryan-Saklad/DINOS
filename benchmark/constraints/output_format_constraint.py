@@ -2,6 +2,7 @@ from benchmark.constraints.constraint import Constraint
 from utils.output_type import OutputType
 
 import json
+import yaml
 
 
 class OutputFormatConstraint(Constraint):
@@ -37,10 +38,14 @@ class OutputFormatConstraint(Constraint):
                 try:
                     json.loads(response)
                 except json.decoder.JSONDecodeError:
-                    self.violations.append("The response is not a valid json format.")
+                    self.violations.append("The response is not in json format.")
                     return False
             case OutputType.YAML:
-                return False
+                try:
+                    yaml.safe_load(response)
+                except yaml.YAMLError:
+                    self.violations.append("The response is not in yaml format.")
+                    return False
             case OutputType.XML:
                 return False
             case OutputType.TEXT:

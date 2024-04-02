@@ -38,4 +38,17 @@ def test_json(text, expected):
     # confirm correct violation is recorded
     if not expected:
         assert len(constraint.violations) == 1
-        assert constraint.violations[0] == "The response is not a valid json format."
+        assert constraint.violations[0] == "The response is not in json format."
+
+
+@pytest.mark.parametrize("text, expected", [
+    ('{ "hello": "world" }', False),
+])
+def test_yaml(text, expected):
+    constraint = OutputFormatConstraint(OutputType.YAML)
+    assert constraint.validate(text) == expected
+
+    # confirm correct violation is recorded
+    if not expected:
+        assert len(constraint.violations) == 1
+        assert constraint.violations[0] == "The response is not in yaml format."
