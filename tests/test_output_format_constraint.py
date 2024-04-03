@@ -59,3 +59,70 @@ def test_yaml(text, expected):
     if not expected:
         assert len(constraint.violations) == 1
         assert constraint.violations[0] == "The response is not in yaml format."
+
+
+xml_text_1 = """<?xml version="1.0" encoding="UTF-8"?>
+<note>
+  <to>Tove</to>
+  <from>Jani</from>
+  <heading>Reminder</heading>
+  <body>Don't forget me this weekend!</body>
+</note>
+"""
+xml_text_2 = """
+<note>
+  <to>Tove</to>
+  <from>Jani</from>
+  <heading>Reminder</heading>
+</note>
+<body>Don't forget me this weekend!</body>
+"""
+xml_text_3 = """
+<note>
+  <to>Tove</to>
+  <from>Jani</from>
+  <heading>Reminder</heading>
+  <body>Don't forget me this weekend!</body>
+</note>
+<?xml version="1.0" encoding="UTF-8"?>"""
+xml_text_4 = """
+<p>This is a paragraph.</p>
+<br />"""
+xml_text_5 = "<message>This is correct</Message>"
+xml_text_6 = "<b><i>This text is bold and italic</b></i>"
+xml_text_7 = "<b><i>This text is bold and italic</i></b>"
+xml_text_8 = """
+<note date=12/11/2007>
+  <to>Tove</to>
+  <from>Jani</from>
+</note>"""
+xml_text_9 = """
+<note date="12/11/2007">
+  <to>Tove</to>
+  <from>Jani</from>
+</note>"""
+xml_text_10 = """<message>salary < 1000</message>"""
+xml_text_11 = """<message>salary &lt; 1000</message>"""
+
+
+@pytest.mark.parametrize("text, expected", [
+    (xml_text_1, True),
+    (xml_text_2, False),  # all elements must have a root
+    (xml_text_3, False),  # prolog must come first if it exists
+    (xml_text_4, False),  # elements must have a closing tag
+    (xml_text_5, False),  # tags are case-sensitive
+    (xml_text_6, False),  # tags must be nested properly
+    (xml_text_7, True),
+    (xml_text_8, False),  # attribute values must be quoted
+    (xml_text_9, True),
+    (xml_text_10, False),  # entity references are required for special characters
+    (xml_text_11, True),
+])
+def test_xml(text, expected):
+    constraint = OutputFormatConstraint(OutputType.XML)
+    assert constraint.validate(text) == expected
+
+    # confirm correct violation is recorded
+    if not expected:
+        assert len(constraint.violations) == 1
+        assert constraint.violations[0] == "The response is not in xml format."

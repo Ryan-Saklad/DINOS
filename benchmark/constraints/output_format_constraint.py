@@ -1,8 +1,9 @@
-from benchmark.constraints.constraint import Constraint
-from utils.output_type import OutputType
-
 import json
 import yaml
+import xml.etree.ElementTree as ET
+
+from benchmark.constraints.constraint import Constraint
+from utils.output_type import OutputType
 
 
 class OutputFormatConstraint(Constraint):
@@ -47,7 +48,11 @@ class OutputFormatConstraint(Constraint):
                     self.violations.append("The response is not in yaml format.")
                     return False
             case OutputType.XML:
-                return False
+                try:
+                    ET.fromstring(response)
+                except ET.ParseError:
+                    self.violations.append("The response is not in xml format.")
+                    return False
             case OutputType.TEXT:
                 return False
 
