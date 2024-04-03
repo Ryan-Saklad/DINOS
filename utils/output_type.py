@@ -5,4 +5,4 @@ class OutputType(Enum):
     JSON = auto()
     YAML = auto()
     XML = auto()
-    TEXT = auto()
+    WRAP = auto()

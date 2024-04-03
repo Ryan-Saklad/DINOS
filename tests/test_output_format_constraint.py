@@ -126,3 +126,68 @@ def test_xml(text, expected):
     if not expected:
         assert len(constraint.violations) == 1
         assert constraint.violations[0] == "The response is not in xml format."
+
+
+wrap_1 = "###"
+wrap_2 = "$$"
+wrap_3 = "@"
+wrap_4 = "------"
+wrap_5 = "@#$%"
+wrap_6 = "%$#"
+wrap_text_1 = f"""{wrap_1}
+hello
+world
+{wrap_1}"""
+wrap_text_2 = f"""Sure, thing. Here's my response
+
+{wrap_2}
+leggo
+my
+eggo
+{wrap_2}"""
+wrap_text_3 = f"""{wrap_3}foo bar
+baz
+1234329487{wrap_3}"""
+wrap_text_4 = f"""
+{wrap_4}
+this
+shouldn't
+matter
+"""
+wrap_text_5 = f"""
+cuckoo
+for
+cocoa
+puffs
+{wrap_5}
+"""
+wrap_text_6 = f"""-{wrap_6}
+this
+should
+fail
+{wrap_6}-"""
+
+
+@pytest.mark.parametrize("text, wrap_text, wrap_lines, expected", [
+    (wrap_text_1, wrap_1, 3, True),
+    (wrap_text_2, wrap_2, 3, True),
+    (wrap_text_2, wrap_2, 2, False),  # wrap_lines is too small
+    (wrap_text_3, wrap_3, 3, True),
+    (wrap_text_4, wrap_4, 2, False),  # wrap text only at start
+    (wrap_text_5, wrap_5, 1, False),  # wrap text only at end
+    (wrap_text_6, wrap_6, 2, False)
+])
+def test_wrap(text, wrap_text, wrap_lines, expected):
+    constraint = OutputFormatConstraint(OutputType.WRAP, wrap_text, wrap_lines)
+    assert constraint.validate(text) == expected
+
+    # confirm correct violation is recorded
+    if not expected:
+        assert len(constraint.violations) == 1
+        assert constraint.violations[0] == "The response is not in wrap format."
+
+
+def test_exceptions():
+    with pytest.raises(ValueError):
+        OutputFormatConstraint(OutputType.WRAP, "")
+        OutputFormatConstraint("test")
