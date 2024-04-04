@@ -34,7 +34,10 @@ class BooleanExpressionProblem(Problem):
         self.problem = self.problem.replace("(True)", "True").replace("(False)", "False")
         self.problem = self.problem.replace("(not True)", "not True").replace("(not False)", "not False")
 
-        self.answer = str(eval(self.problem))
+        self.answer = self.evaluate(self.problem)
+
+    def evaluate(self, expression: str) -> str:
+        return str(eval(expression))
 
     def validate(self, response: str) -> bool:
         return self.answer == response
