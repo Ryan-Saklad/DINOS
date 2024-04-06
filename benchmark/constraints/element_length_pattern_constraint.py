@@ -4,6 +4,7 @@ from utils.element_type import ElementType
 from utils.split_elements import split_elements
 
 class ElementLengthPatternConstraint(Constraint):
+    category = "Element Constraint"
     def __init__(self, element_type: ElementType, scope_type: ElementType, increasing: bool, min_length_diff: int = 1) -> None:
         """
         Initializes the element length pattern constraint.
@@ -29,6 +30,7 @@ class ElementLengthPatternConstraint(Constraint):
         self.scope_type: ElementType = scope_type
         self.increasing: bool = increasing
         self.min_length_diff: int = min_length_diff
+        self.category = "Element Constraint"
 
         pattern = "increasing" if increasing else "decreasing"
         description = f"The lengths of {element_type.name.lower()} within each {scope_type.name.lower()[:-1]} should be in {pattern} order"

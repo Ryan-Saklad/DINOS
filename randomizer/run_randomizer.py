@@ -8,6 +8,8 @@ parser.add_argument('--topic', action='store_true', help='Include a topic in the
 parser.add_argument('--seed', type=int, default=None, help='Seed for random number generator')
 parser.add_argument('--output', type=str, default='random_prompts.csv', help='Output file path for the prompts')
 parser.add_argument('--num_per_prompt', type=int, default=-1, help='Number of constraints per prompt, defaults to no limit')
+parser.add_argument('--constraint_type', type=str, default=None, help='Type of constraint to generate, defaults to random')
+
 args = parser.parse_args()
 
 def run_prompt_generator(args) : 
@@ -15,9 +17,9 @@ def run_prompt_generator(args) :
     Run the prompt generator
     args : arguments from the command line    
     '''
-    prompts, objects = dinos_maker.make_prompts(args.seed, args.num_prompts, args.topic, args.num_per_prompt)
+    prompts, objects = dinos_maker.make_prompts(args.seed, args.num_prompts, args.topic, args.num_per_prompt, args.constraint_type)
     # Save the prompts to a csv file
-    df = pd.DataFrame(prompts, columns = ['Prompt'])
+    df = pd.DataFrame(prompts, columns = ['Prompt', ["Constraint Type"]])
     df.to_csv(args.output , index = False)
     print("Prompts saved to", args.output)
     import pickle

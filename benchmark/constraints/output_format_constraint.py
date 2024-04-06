@@ -7,6 +7,7 @@ from utils.output_type import OutputType
 
 
 class OutputFormatConstraint(Constraint):
+    category = "Element Constraint"
     def __init__(self, output_type: OutputType, wrap_text: str = "", wrap_lines: int = 3):
         """
         Initializes the output format type constraint.
@@ -29,6 +30,7 @@ class OutputFormatConstraint(Constraint):
         self.output_type: OutputType = output_type
         self.wrap_text: str | None = wrap_text
         self.wrap_lines: int = wrap_lines
+        self.category = "Output Format Constraint"
 
         super().__init__(f"{output_type.name.lower()} output format constraint.")
 

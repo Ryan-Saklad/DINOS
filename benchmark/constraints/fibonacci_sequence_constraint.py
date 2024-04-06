@@ -3,6 +3,7 @@ from utils.element_type import ElementType
 from utils.count_elements import count_elements
 
 class FibonacciSequenceConstraint(Constraint):
+    category = "Element Constraint"
     """
     This class extends the Constraint class to check if the number of elements
     (words, characters, sentences, or paragraphs) in a given response text is a Fibonacci number.
@@ -24,6 +25,7 @@ class FibonacciSequenceConstraint(Constraint):
             raise ValueError("element_type must be an instance of ElementType")
 
         self.element_type = element_type
+        self.category = "Element Constraint"
         description = f"The number of {element_type.name.lower()} in the response must be a Fibonacci number."
         super().__init__(description)
 

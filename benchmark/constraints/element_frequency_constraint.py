@@ -3,6 +3,7 @@ from utils.element_type import ElementType
 from utils.count_elements import count_elements
 
 class ElementFrequencyConstraint(Constraint):
+    category = "Element Constraint"
     def __init__(self, element_type: ElementType, element: str, min_frequency: float = None, max_frequency: float = None, case_sensitive: bool = True) -> None:
         """
         Initializes the element frequency constraint with specific frequency requirements for validation.
@@ -29,6 +30,7 @@ class ElementFrequencyConstraint(Constraint):
         self.min_frequency: float = min_frequency or 0.0
         self.max_frequency: float = max_frequency or 1.0
         self.case_sensitive: bool = case_sensitive
+        self.category = "Element Constraint"
 
         description_parts = [f"{element_type.name.lower()} frequency constraint for '{element}':"]
         if min_frequency:
