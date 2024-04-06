@@ -45,12 +45,12 @@ topics = [
 ]
 
 
-def make_prompts(seed, num_prompts = 1, topic = False) : 
+def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1) : 
     constraint_gatherer.set_seed(seed)
     prompts = []
     prompts_object = []
     for num_runs in range(num_prompts) : 
-        constraints = constraint_gatherer.gather_constraints(initial_constraints)
+        constraints = constraint_gatherer.gather_constraints(initial_constraints, num_constraints = num_per_prompt)
         single_run_prompts = []
         for i in constraints : 
             if i == ElementCountConstraint : 

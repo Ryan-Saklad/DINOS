@@ -7,7 +7,7 @@ def randomizer() :
 def set_seed(seed = 42) : 
     random.seed(seed)
 
-def gather_constraints(list_of_constraints, seed = None) :
+def gather_constraints(list_of_constraints, seed = None, num_constraints = -1) :
     '''
     This function randomly selects constraints to add to the list of constraints
     list_of_constraints : list of constraints to choose from
@@ -17,7 +17,10 @@ def gather_constraints(list_of_constraints, seed = None) :
     if seed : # Single run seed for random number generator, multiple runs will require an external seed
         set_seed(seed)
     # Randomly select constraints to add
-    for constraint in list_of_constraints : 
-        if randomizer() > 0.5 : 
-            constraints.append(constraint)
+    if num_constraints == -1 :
+        for constraint in list_of_constraints : 
+            if randomizer() > 0.5 : 
+                constraints.append(constraint)
+    else: 
+        constraints = random.sample(list_of_constraints, num_constraints)
     return constraints
