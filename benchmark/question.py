@@ -16,15 +16,21 @@ class Question:
 
         # Check constraints
         violated_constraints_descriptions: list[str] = []
+        num_all_constraints = len(self.constraints)
+        num_valid_constraints = 0
         for constraint in self.constraints:
             if not constraint.validate(response):
                 violated_constraints_descriptions.extend(constraint.violations)
+            else :
+                num_valid_constraints += 1
+        partial_correctness = num_valid_constraints / num_all_constraints
+        partial_correctness_string = "Out of {num_all_constraints} constraints, {num_valid_constraints} were satisfied, Partial Correctness Score = {partial_correctness}.".format(num_all_constraints = num_all_constraints, num_valid_constraints = num_valid_constraints, partial_correctness = partial_correctness)
 
         # Determine overall correctness based on the absence of constraint violations
         correctness: bool = len(violated_constraints_descriptions) == 0
 
         # Return evaluation result and any constraint violations descriptions
-        return correctness, violated_constraints_descriptions
+        return correctness, violated_constraints_descriptions, partial_correctness_string
 
     def provide_feedback(self, evaluation_result: tuple[bool, list[str]]) -> str:
         # Generate feedback based on the evaluation of the response

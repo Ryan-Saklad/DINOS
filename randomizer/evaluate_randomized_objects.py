@@ -20,7 +20,7 @@ def evaluate_prompts(args) :
     results = []
     for prompt in range(len(prompt_objects)) : 
         results.append(prompt_objects[prompt].evaluate_response(model_responses[prompt]))
-    df = pd.DataFrame(results, columns = ['Correctness', 'Violated Constraints'])
+    df = pd.DataFrame(results, columns = ['Correctness', 'Violated Constraints', 'Partial Correctness'])
     df.to_csv(args.output, index = False)
     print("Evaluation results saved to", args.output)
 
