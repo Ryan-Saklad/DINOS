@@ -191,3 +191,14 @@ def test_exceptions():
     with pytest.raises(ValueError):
         OutputFormatConstraint(OutputType.WRAP, "")
         OutputFormatConstraint("test")
+
+
+@pytest.mark.parametrize("output_type, wrap_text, expected", [
+    (OutputType.JSON, "", "The response must be given in JSON format. There should be a 'Response' key with corresponding value equal to the response."),
+    (OutputType.YAML, "", "The response must be given in YAML format. There should be a 'Response' key with corresponding value equal to the response."),
+    (OutputType.XML, "", "The response must be given in XML format. The root tag should be named 'Response' and should directly enclose the response."),
+    (OutputType.WRAP, "####", "The response must be enclosed in '####' characters. That is, the response should start and end with '####'.")
+])
+def test_description_text(output_type, wrap_text, expected):
+    constraint = OutputFormatConstraint(output_type, wrap_text)
+    assert constraint.description == expected

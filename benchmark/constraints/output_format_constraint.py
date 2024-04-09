@@ -30,7 +30,7 @@ class OutputFormatConstraint(Constraint):
         self.wrap_text: str | None = wrap_text
         self.wrap_lines: int = wrap_lines
 
-        super().__init__(f"{output_type.name.lower()} output format constraint.")
+        super().__init__(self.generate_description())
 
     def validate(self, response: str) -> bool:
         """
@@ -84,3 +84,19 @@ class OutputFormatConstraint(Constraint):
                     return False
 
         return True
+
+    def generate_description(self):
+        """
+        Creates a description based on the output type. The description is used to generate prompts when
+        executing DINOS/randomizer/run_randomizer.py.
+        """
+        description = f"The response must be given in {self.output_type.name} format."
+        match self.output_type:
+            case OutputType.JSON | OutputType.YAML:
+                description += " There should be a 'Response' key with corresponding value equal to the response."
+            case OutputType.XML:
+                description += " The root tag should be named 'Response' and should directly enclose the response."
+            case OutputType.WRAP:
+                description = f"The response must be enclosed in '{self.wrap_text}' characters. That is, the response should start and end with '{self.wrap_text}'."
+
+        return description
