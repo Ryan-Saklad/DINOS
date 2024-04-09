@@ -1,0 +1,2 @@
+Prompt
+Please generate a response that satisfies the following constraints: Topic: Anything; words count constraint: element 'book' exactly 8; characters frequency constraint for 'sing': minimum 51.0% maximum 100%; The character 'c' should be repeated between 51 and 80 times within each paragraph (case-sensitive); The number of words in the response must be a Fibonacci number.

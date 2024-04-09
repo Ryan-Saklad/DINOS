@@ -64,14 +64,55 @@ class Question:
         else:
             self.prompt = "Please generate a response that satisfies the following constraints:\n- Topic: {topic}\n- ".format(topic=self.topic) + "\n- ".join(task_descriptions)
 
-    def evaluate_response(self, response: str) -> tuple[bool, list[str]]:
-        # Evaluate the LLM's response against the constraints
+    def evaluate_response(self, response: str, seed: str | None = None) -> tuple[bool, list[str]]:
+        def validate_topic_with_llm() -> bool:
+            import json
+            import math
+
+            import dotenv
+            import openai
+
+            dotenv.load_dotenv()
+
+            client: openai.OpenAI = openai.OpenAI()
+
+            completion = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": f"Is the given response about the topic {self.topic}? Respond only with 'Yes' or 'No'."},
+                    {"role": "user", "content": response}
+                ],
+                logprobs=True,
+                top_logprobs=2,
+                logit_bias={9642: 100, 2822: 100}, # Adjust logit bias so 'Yes' and 'No' are extremely likely
+                max_tokens=1,
+                seed=seed
+            )
+
+            model_completion: str = completion.choices[0].logprobs
+            json_response: dict = json.loads(model_completion.json())
+            top_logprobs: list[dict] = json_response["content"][0]["top_logprobs"]
+            probabilities: list[float] = [math.exp(logprob["logprob"]) for logprob in top_logprobs]
+
+            # If one option is the clear winner, return that
+            if probabilities[0] > 0.95:
+                return "yes" in top_logprobs[0]["token"].lower()
+
+            # Otherwise, raise an error because it is unclear which option is correct
+            import warnings
+            warnings.warn(f"Unable to determine the validity of the topic '{self.topic}' with the given response: {response}. \nLogprobs: {top_logprobs}")
+
+            # If we can't determine the validity, it is probably False
+            return False
 
         # Check constraints
         violated_constraints_descriptions: list[str] = []
         for constraint in self.constraints:
             if not constraint.validate(response):
                 violated_constraints_descriptions.extend(constraint.violations)
+
+        if not validate_topic_with_llm():
+            violated_constraints_descriptions.append("The response does not match the given topic.")
 
         # Determine overall correctness based on the absence of constraint violations
         correctness: bool = len(violated_constraints_descriptions) == 0
