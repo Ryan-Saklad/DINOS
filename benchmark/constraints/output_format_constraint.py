@@ -13,9 +13,11 @@ class OutputFormatConstraint(Constraint):
 
         Args:
             output_type (OutputType): Specifies the output format expected in validation (e.g., json, yaml).
-            wrap_text (str): The text to wrap output in (e.g., ###, $$$).
+            wrap_text (str | None): The text to wrap output in (e.g., ###, $$$).
             wrap_lines (int): The number of lines to check for wrapping text. Defaults to 3 to ignore boilerplate
                 responses and system tokens. A higher value will trade off false negatives for false positives.
+            response (str | None): The model's response to a prompt that has an output format constraint. None when
+                the response does not meet the requirements of the constraint.
 
         Raises:
             ValueError: If the provided output type is not of OutputType, or if no wrapping text is provided
@@ -29,12 +31,14 @@ class OutputFormatConstraint(Constraint):
         self.output_type: OutputType = output_type
         self.wrap_text: str | None = wrap_text
         self.wrap_lines: int = wrap_lines
+        self.response: str | None = None
 
         super().__init__(self.generate_description())
 
     def validate(self, response: str) -> bool:
         """
-        Validates if the given string is given in the expected output format.
+        Validates if the given string is given in the expected output format. Upon successful validation,
+        the model's response will be saved as the instance's response attribute.
 
         Args:
             response (str): The response text to validate.
@@ -45,21 +49,26 @@ class OutputFormatConstraint(Constraint):
         match self.output_type:
             case OutputType.JSON:
                 try:
-                    json.loads(response)
-                except json.decoder.JSONDecodeError:
-                    self.violations.append("The response is not in json format.")
+                    result = json.loads(response)['Response']
+                    self.response = result
+                except (json.decoder.JSONDecodeError, KeyError):
+                    self.violations.append("The response is not in the requested format.")
                     return False
             case OutputType.YAML:
                 try:
-                    yaml.safe_load(response)
-                except yaml.YAMLError:
-                    self.violations.append("The response is not in yaml format.")
+                    result = yaml.safe_load(response)['Response']
+                    self.response = result
+                except (yaml.YAMLError, KeyError):
+                    self.violations.append("The response is not in the requested format.")
                     return False
             case OutputType.XML:
                 try:
-                    ET.fromstring(response)
-                except ET.ParseError:
-                    self.violations.append("The response is not in xml format.")
+                    result = ET.fromstring(response)
+                    if result.tag.lower() != 'response' or not isinstance(result.text, str):
+                        raise ValueError
+                    self.response = result.text.strip()
+                except (ET.ParseError, ValueError, IndexError):
+                    self.violations.append("The response is not in the requested format.")
                     return False
             case OutputType.WRAP:
                 lines = response.split("\n")
@@ -80,15 +89,22 @@ class OutputFormatConstraint(Constraint):
 
                 # the response is only valid if it starts and ends with the correct text
                 if not (start_valid & end_valid):
-                    self.violations.append("The response is not in wrap format.")
+                    self.violations.append("The response is not in the requested format.")
                     return False
+                else:
+                    parsed_start = [line.removeprefix(self.wrap_text) for line in wrap_start]
+                    parsed_end = [line.removesuffix(self.wrap_text) for line in wrap_end]
+                    self.response = '\n'.join(parsed_start + lines[num_lines:-num_lines] + parsed_end)
 
         return True
 
-    def generate_description(self):
+    def generate_description(self) -> str:
         """
         Creates a description based on the output type. The description is used to generate prompts when
         executing DINOS/randomizer/run_randomizer.py.
+
+        Returns:
+            str: The description specific to the output type.
         """
         description = f"The response must be given in {self.output_type.name} format."
         match self.output_type:
