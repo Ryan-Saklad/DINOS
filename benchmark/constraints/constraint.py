@@ -6,7 +6,7 @@ class Constraint(ABC):
         self.description = description
         self.violations: list[str] = []
 
-        self.problem_type: ProblemType = ProblemType.CONSTRAINT
+        self.problem_type: ProblemType = ProblemType.ELEMENT_CONSTRAINT
 
     @abstractmethod
     def validate(self, response: str) -> bool:
