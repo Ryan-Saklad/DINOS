@@ -1,7 +1,7 @@
 import random
 from typing import List
 
-class LogicalDeductionProblem:
+class LogicalDeductionFiveObjectsProblem:
     def __init__(self) -> None:
         self.prompt: str = ""
         self.options: List[str] = []
@@ -20,7 +20,7 @@ class LogicalDeductionProblem:
             self.generate_golfers_problem()
 
     def generate_golfers_problem() -> tuple[str, List[str]]:
-        golfers = ["Rob", "Ada", "Dan", "Joe", "Mel"]
+        golfers = ["Rob", "Ada", "Dan", "Joe", "Mel", "Bob", "Ryan", "Grace", "Ben", "Nate"]
         random.shuffle(golfers)
         
         statements = [
@@ -42,7 +42,7 @@ class LogicalDeductionProblem:
     
     
     def generate_animals_problem(self) -> None:
-        animals = ["lion", "tiger", "elephant", "giraffe", "zebra"]
+        animals = ["lion", "tiger", "elephant", "giraffe", "zebra", "bird", "horse", "bear", "dinosaur", "whale", "fish"]
         random.shuffle(animals)
 
         statements = [
@@ -61,7 +61,7 @@ class LogicalDeductionProblem:
         self.options = [f"({chr(65+i)}) The {animals[i]} is the rightmost." for i in range(5)]
 
     def generate_fruits_problem(self) -> None:
-        fruits = ["apple", "banana", "orange", "kiwi", "grape"]
+        fruits = ["apple", "banana", "orange", "kiwi", "grape", "pomegranate", "blueberry", "raspberry", "strawberry", "blackberry", "cherry", "coconut", "pear", "tangerine", "clementine"]
         random.shuffle(fruits)
 
         statements = [
