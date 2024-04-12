@@ -13,8 +13,8 @@ class DoubleLetterConstraint(Constraint):
     def validate(self, response: str) -> bool:
         """
         Validates the models response and saves words that contain double letters,
-        if any. A double letter word is not the same as an isogram. A double letter
-        word contains at least one letter that appears consecutively.
+        if any. A double letter word is not the same as an isogram. In a double letter
+        word, the same letter appears consecutively one or more times.
 
         Arg:
             response (str): The model's response.
