@@ -1,5 +1,5 @@
 import argparse
-import dinos_maker
+from randomizer import dinos_maker
 import pandas as pd
 
 parser = argparse.ArgumentParser(description='Generate random prompts for the Dinos Maker')
@@ -23,4 +23,6 @@ def run_prompt_generator(args) :
     with open(args.output.replace('.csv', '.pkl'), 'wb') as f:
         pickle.dump(objects, f)
     print("Objects saved to", args.output.replace('.csv', '.pkl'))
-run_prompt_generator(args)
+
+if __name__ == '__main__':
+    run_prompt_generator(args)
