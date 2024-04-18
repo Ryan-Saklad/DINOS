@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 
 from benchmark.constraints.constraint import Constraint
 from utils.output_type import OutputType
-
+from utils.problem_type import ProblemType
 
 class OutputFormatConstraint(Constraint):
     def __init__(self, output_type: OutputType, wrap_text: str = "", wrap_lines: int = 3):
@@ -32,6 +32,7 @@ class OutputFormatConstraint(Constraint):
         self.wrap_text: str | None = wrap_text
         self.wrap_lines: int = wrap_lines
         self.response: str | None = None
+        self.problem_type = ProblemType.OUTPUT_FORMAT
 
         super().__init__(self.get_description())
 
