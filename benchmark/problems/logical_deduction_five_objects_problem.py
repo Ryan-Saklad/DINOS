@@ -3,6 +3,8 @@ import random
 from utils.names import names
 
 class LogicalDeductionFiveObjectsProblem:
+    raise NotImplementedError("This class is not yet implemented.")
+    """
     def __init__(self) -> None:
         self.prompt: str = ""
         self.options: list[str] = []
@@ -98,3 +100,4 @@ class LogicalDeductionFiveObjectsProblem:
         print("\nOptions:")
         for option in self.options:
             print(option)
+    """
