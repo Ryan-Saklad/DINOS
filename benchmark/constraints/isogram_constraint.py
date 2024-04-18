@@ -1,5 +1,6 @@
 import string
-from .constraint import Constraint
+
+from benchmark.constraints.constraint import Constraint
 
 
 class IsogramConstraint(Constraint):

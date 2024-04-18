@@ -33,7 +33,7 @@ class OutputFormatConstraint(Constraint):
         self.wrap_lines: int = wrap_lines
         self.response: str | None = None
 
-        super().__init__(self.generate_description())
+        super().__init__(self.get_description())
 
     def validate(self, response: str) -> bool:
         """
@@ -98,7 +98,7 @@ class OutputFormatConstraint(Constraint):
 
         return True
 
-    def generate_description(self) -> str:
+    def get_description(self) -> str:
         """
         Creates a description based on the output type. The description is used to generate prompts when
         executing DINOS/randomizer/run_randomizer.py.

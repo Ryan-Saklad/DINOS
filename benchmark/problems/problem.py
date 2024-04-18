@@ -15,3 +15,12 @@ class Problem(ABC):
     @abstractmethod
     def validate(self, response: str) -> bool:
         pass
+
+    def get_description(self, include_problem: bool = True) -> str:
+        if include_problem:
+            return f"{self.prompt}\n{self.problem}"
+        else:
+            return self.prompt
+
+    def get_answer(self) -> str:
+        return self.answer

@@ -1,27 +1,23 @@
 import random
-from typing import List
+
+from utils.names import names
 
 class LogicalDeductionFiveObjectsProblem:
     def __init__(self) -> None:
         self.prompt: str = ""
-        self.options: List[str] = []
+        self.options: list[str] = []
 
     def generate(self) -> None:
-        objects = ["animals", "fruits", "colors"]
+        objects = ["animals", "fruits", "colors", "golfers"]
         random.shuffle(objects)
 
-        if objects[0] == "animals":
-            self.generate_animals_problem()
-        elif objects[0] == "fruits":
-            self.generate_fruits_problem()
-        elif objects[0] == "colors":
-            self.generate_colors_problem()
-        elif objects[0] == "golfers":
-            self.generate_golfers_problem()
+        for obj in objects:
+            getattr(self, f"generate_{obj}_problem")()
 
-    def generate_golfers_problem() -> tuple[str, List[str]]:
-        golfers = ["Rob", "Ada", "Dan", "Joe", "Mel", "Bob", "Ryan", "Grace", "Ben", "Nate"]
+    def generate_golfers_problem() -> tuple[str, list[str]]:
+        golfers = names
         random.shuffle(golfers)
+        golfers = golfers[:5]
         
         statements = [
             f"{golfers[1]} finished above {golfers[4]}.",
@@ -39,7 +35,6 @@ class LogicalDeductionFiveObjectsProblem:
         options = [f"({chr(65+i)}) {golfer} finished second." for i, golfer in enumerate(golfers)]
 
         return prompt, options
-    
     
     def generate_animals_problem(self) -> None:
         animals = ["lion", "tiger", "elephant", "giraffe", "zebra", "bird", "horse", "bear", "dinosaur", "whale", "fish"]

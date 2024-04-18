@@ -58,7 +58,7 @@ class NavigateProblem(Problem):
                 elif turn == "around":
                     facing = (facing + 2) % 4
 
-        self.problem = self.prompt + " ".join(actions)
+        self.problem = " ".join(actions)
         self.answer = f"({x}, {y})"
 
     def validate(self, response: str) -> bool:

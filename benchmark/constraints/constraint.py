@@ -11,3 +11,9 @@ class Constraint(ABC):
     @abstractmethod
     def validate(self, response: str) -> bool:
         pass
+
+    def get_description(self) -> str:
+        return self.description
+
+    def get_violations(self) -> list[str]:
+        return self.violations
