@@ -1,4 +1,3 @@
-import random
 from benchmark.problems.problem import Problem
 
 class DyckLanguageProblem(Problem):
@@ -13,21 +12,21 @@ class DyckLanguageProblem(Problem):
             if length == 0:
                 return ""
             elif length == 1:
-                return random.choice(self.parens)
+                return self.rng.choice(self.parens)
             else:
-                split = random.randint(0, length - 1)
+                split = self.rng.randint(0, length - 1)
                 left = generate_dyck_word(split)
                 right = generate_dyck_word(length - split - 1)
-                paren = random.choice(self.parens)
+                paren = self.rng.choice(self.parens)
                 return f"{paren[0]}{left}{right}{paren[1]}"
 
         self.parens: list[tuple[str, str]] = [("(", ")"), ("[", "]"), ("{", "}"), ("<", ">")]
-        length: int = random.randint(min_length, max_length)
+        length: int = self.rng.randint(min_length, max_length)
         self.problem = generate_dyck_word(length // 2)  # Dyck words have even length
 
         # Ensure there are no starting parentheses left
         last_start_char_index = max(self.problem.rfind(paren[0]) for paren in self.parens)
-        split_index = random.randint(last_start_char_index + 1, len(self.problem) - 1)
+        split_index = self.rng.randint(last_start_char_index + 1, len(self.problem) - 1)
         self.answer = self.problem[split_index:]
         self.problem = self.problem[:split_index]
 

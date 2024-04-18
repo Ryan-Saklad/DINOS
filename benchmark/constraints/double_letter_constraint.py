@@ -1,7 +1,6 @@
 import string
 from benchmark.constraints.constraint import Constraint
 
-
 class DoubleLetterConstraint(Constraint):
     """Requires a model to respond to a prompt without using words that contain
     double letters."""

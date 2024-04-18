@@ -1,5 +1,3 @@
-import random
-
 from benchmark.problems.problem import Problem
 
 class NavigateProblem(Problem):
@@ -19,10 +17,10 @@ class NavigateProblem(Problem):
         facing = 0  # 0: North, 1: East, 2: South, 3: West
 
         for _ in range(num_steps):
-            action_type = random.choice(["move", "turn"])
+            action_type = self.rng.choice(["move", "turn"])
             if action_type == "move":
-                direction = random.choice(directions)
-                steps = random.randint(min_distance, max_distance)
+                direction = self.rng.choice(directions)
+                steps = self.rng.randint(min_distance, max_distance)
                 action = f"Take {steps} step{'s' if steps > 1 else ''} {direction}."
                 actions.append(action)
 
@@ -47,7 +45,7 @@ class NavigateProblem(Problem):
                     elif facing == 2: x -= steps
                     elif facing == 3: y += steps
             else:
-                turn = random.choice(turns)
+                turn = self.rng.choice(turns)
                 action = f"Turn {turn}."
                 actions.append(action)
 

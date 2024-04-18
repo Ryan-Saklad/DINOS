@@ -1,12 +1,13 @@
-from abc import ABC, abstractmethod
+import random
 
+from abc import ABC, abstractmethod
 from utils.problem_type import ProblemType
 
 class Problem(ABC):
-    def __init__(self) -> None:
+    def __init__(self, seed: int | None = None) -> None:
         self.problem: str = ""
         self.answer: str = ""
-
+        self.rng: random.Random = random.Random(seed if seed is not None else random.randint(0, 1000000))
         self.problem_type: ProblemType = ProblemType.PROBLEM
 
     def generate(self) -> None:

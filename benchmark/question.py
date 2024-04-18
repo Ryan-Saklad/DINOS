@@ -76,7 +76,20 @@ class Question:
 
             client: openai.OpenAI = openai.OpenAI()
 
-            completion = client.chat.completions.create(
+            if seed is None:
+                completion = client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": f"Is the given response about the topic {self.topic}? Respond only with 'Yes' or 'No'."},
+                        {"role": "user", "content": response}
+                    ],
+                    logprobs=True,
+                    top_logprobs=2,
+                    logit_bias={9642: 100, 2822: 100}, # Adjust logit bias so 'Yes' and 'No' are extremely likely
+                    max_tokens=1
+                )
+            else:
+                completion = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": f"Is the given response about the topic {self.topic}? Respond only with 'Yes' or 'No'."},

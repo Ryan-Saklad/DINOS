@@ -1,5 +1,3 @@
-import random
-
 from benchmark.problems.problem import Problem
 from utils.names import names
 
@@ -11,11 +9,11 @@ class LiarProblem(Problem):
         self.truthfulness: dict[str, bool] = {}
         self.statements: list[str] = []
         self.final_truth: bool = False
-        self.statement_style: bool = random.choice([True, False])
+        self.statement_style: bool = self.rng.choice([True, False])
 
     def generate(self, num_people: int = 5) -> None:
-        self.names = random.sample(CHARACTER_NAMES, num_people)
-        self.truthfulness = {name: random.choice([True, False]) for name in self.names}
+        self.names = self.rng.sample(names, num_people)
+        self.truthfulness = {name: self.rng.choice([True, False]) for name in self.names}
 
         self.statements.append(f"{self.names[0]} always {'tells the truth' if self.truthfulness[self.names[0]] else 'lies'}.")
 

@@ -1,5 +1,3 @@
-import random
-
 from benchmark.problems.problem import Problem
 
 class BooleanExpressionProblem(Problem):
@@ -12,23 +10,23 @@ class BooleanExpressionProblem(Problem):
     def generate(self, min_depth: int = 3, max_depth: int = 5) -> None:
         def generate_expression(depth: int) -> str:
             if depth == 1:
-                return random.choice(self.bool_values)
+                return self.rng.choice(self.bool_values)
             else:
                 sub_expr1 = generate_expression(depth - 1)
                 sub_expr2 = generate_expression(depth - 1)
 
                 # Randomly choose to use a unary operator or a binary operator
-                if random.random() < 0.5:
+                if self.rng.random() < 0.5:
                     return f"{self.unary_operator} ({sub_expr1})"
                 else:
-                    operator = random.choice(self.operators)
+                    operator = self.rng.choice(self.operators)
                     return f"({sub_expr1}) {operator} ({sub_expr2})"
 
         self.bool_values: list[str] = ["True", "False"]
         self.operators: list[str] = ["and", "or"]
         self.unary_operator: str = "not"
 
-        depth: int = random.randint(min_depth, max_depth)
+        depth: int = self.rng.randint(min_depth, max_depth)
 
         self.problem = generate_expression(depth)
         self.problem = self.problem.replace("(True)", "True").replace("(False)", "False")
