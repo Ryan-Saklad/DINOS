@@ -23,7 +23,11 @@ def gather_constraints(list_of_constraints, seed = None, num_constraints = -1, c
                 if constraint_type : 
                     if constraint_type == constraint.category : 
                         constraints.append(constraint)
+                else : 
+                    constraints.append(constraint)
     else: 
         if constraint_type : 
             constraints = random.sample([constraint for constraint in list_of_constraints if constraint.category == constraint_type], num_constraints)
+        else :
+            constraints = random.sample(list_of_constraints, num_constraints)
     return constraints
