@@ -11,5 +11,9 @@ venv/
 # Keys
 *.env
 
+# Generated files
+random_prompts.csv
+random_prompts.pkl
+
 # PyCharm
 .idea/

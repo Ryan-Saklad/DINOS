@@ -5,76 +5,78 @@ from benchmark.constraints.output_format_constraint import OutputFormatConstrain
 from utils.output_type import OutputType
 
 
-@pytest.mark.parametrize("text, expected", [
-    ('{ "hello": "world" }', True),  # key/value must be in double quotes
-    ("{ hello: world }", False),
-    ('{ 1: "world" }', False),  # key must be a string
-    ('{ true: "world" }', False),
-    ('{ false: "world" }', False),
-    ('{ null: "world" }', False),
-    ('{ "1": "world" }', True),
-    ('{ 1.0: "world" }', False),
-    ('{ "hello": 1 }', True),  # values can be numbers
-    ('{ "hello": 1.0 }', True),
-    ('{ "hello": 2e10 }', True),
-    ('{ "hello": 2E-10 }', True),
-    ('{ "hello": { "foo": "bar" } }', True),  # values can be nested objects
-    ('{ "hello": { 1: "bar" } }', False),
-    ('{ "hello": ["world", "foo", "bar"] }', True),  # values can be arrays
-    ('{ "hello": [1, 2, 3, 4] }', True),
-    ('{ "hello": [true, false, true, false] }', True),
-    ('{ "hello": [null, null, true, false] }', True),
-    ('{ "hello": ["world", 1, true, null] }', True),  # mixed-type arrays are allowed in json
-    ('{ "hello": [{"foo": "bar", "yes": "no"}, { "mr": "mrs" }] }', True),
-    ('{"hello":"world"}', True),  # whitespace doesn't matter
-    ('  {  "hello"  :  "world"  }  ', True),
-    ('\t{\t"hello"\t:\t"world"\t}\t', True),
-    ('\n{\n"hello"\n:\n"world"\n}\n', True),
-    ('\n\r{\n\r"hello"\n\r:\n\r"world"\n\r}\n\r', True),
+@pytest.mark.parametrize("text, expected, response", [
+    ('{ "Response": "world" }', True, 'world'),  # key/value must be in double quotes
+    ('{ "hello": "world" }', False, None),  # the response must be given with a 'Response' key
+    ("{ hello: world }", False, None),
+    ('{ 1: "world" }', False, None),  # key must be a string
+    ('{ true: "world" }', False, None),
+    ('{ false: "world" }', False, None),
+    ('{ null: "world" }', False, None),
+    ('{ 1.0: "world" }', False, None),
+    ('{ "Response": 1 }', True, 1),  # values can be numbers
+    ('{ "Response": 1.0 }', True, 1.0),
+    ('{ "Response": 2e10 }', True, 2e10),
+    ('{ "Response": 2E-10 }', True, 2E-10),
+    ('{ "Response": { "foo": "bar" } }', True, dict(foo='bar')),  # values can be nested objects
+    ('{ "hello": { 1: "bar" } }', False, None),
+    ('{ "Response": ["world", "foo", "bar"] }', True, ['world', 'foo', 'bar']),  # values can be arrays
+    ('{ "Response": [1, 2, 3, 4] }', True, [1, 2, 3, 4]),
+    ('{ "Response": [true, false, true, false] }', True, [True, False, True, False]),
+    ('{ "Response": [null, null, true, false] }', True, [None, None, True, False]),
+    ('{ "Response": ["world", 1, true, null] }', True, ['world', 1, True, None]),  # mixed-type arrays are allowed in json
+    ('{ "Response": [{"foo": "bar", "yes": "no"}, { "mr": "mrs" }] }', True, [dict(foo='bar', yes='no'), dict(mr='mrs')]),
+    ('{"Response":"world"}', True, 'world'),  # whitespace doesn't matter
+    ('  {  "Response"  :  "world"  }  ', True, 'world'),
+    ('\t{\t"Response"\t:\t"world"\t}\t', True, 'world'),
+    ('\n{\n"Response"\n:\n"world"\n}\n', True, 'world'),
+    ('\n\r{\n\r"Response"\n\r:\n\r"world"\n\r}\n\r', True, 'world'),
 ])
-def test_json(text, expected):
+def test_json(text, expected, response):
     constraint = OutputFormatConstraint(OutputType.JSON)
     assert constraint.validate(text) == expected
+    assert constraint.response == response
 
     # confirm correct violation is recorded
     if not expected:
         assert len(constraint.violations) == 1
-        assert constraint.violations[0] == "The response is not in json format."
+        assert constraint.violations[0] == "The response is not in the requested format."
 
 
-@pytest.mark.parametrize("text, expected", [
-    ("hello: world: foo", False),  # must be a key: value pair
-    ("hello: world", True),
-    ("hello:\n\t- foo\n\t- bar", False),  # can't use tabs as whitespace
-    ("hello:\n- foo\n- bar", True),
-    ("1: hello", True),
-    ("hello: [foo, bar, 2.0, 3e10, 0xC, 0o14]\nworld:\n  - leggo\n  - myeggo", True),  # additional data types
-    (f"hello: {datetime.datetime.now()}", True)
+@pytest.mark.parametrize("text, expected, response", [
+    ("hello: world: foo", False, None),  # must be a key: value pair
+    ("Response: world", True, 'world'),
+    ("hello:\n\t- foo\n\t- bar", False, None),  # can't use tabs as whitespace
+    ("Response:\n- foo\n- bar", True, ['foo', 'bar']),
+    ("1: hello", False, None),
+    ("Response: [foo, bar, 2.0, 0xC]\nworld:\n  - leggo\n  - myeggo", True, ['foo', 'bar', 2.0, 0xC]),  # additional data types
 ])
-def test_yaml(text, expected):
+def test_yaml(text, expected, response):
     constraint = OutputFormatConstraint(OutputType.YAML)
     assert constraint.validate(text) == expected
+    assert constraint.response == response
 
     # confirm correct violation is recorded
     if not expected:
         assert len(constraint.violations) == 1
-        assert constraint.violations[0] == "The response is not in yaml format."
+        assert constraint.violations[0] == "The response is not in the requested format."
 
 
 xml_text_1 = """<?xml version="1.0" encoding="UTF-8"?>
-<note>
+<Response>
+  This is the response
   <to>Tove</to>
   <from>Jani</from>
   <heading>Reminder</heading>
   <body>Don't forget me this weekend!</body>
-</note>
+</Response>
 """
 xml_text_2 = """
-<note>
+<Response>
   <to>Tove</to>
   <from>Jani</from>
   <heading>Reminder</heading>
-</note>
+</Response>
 <body>Don't forget me this weekend!</body>
 """
 xml_text_3 = """
@@ -90,42 +92,44 @@ xml_text_4 = """
 <br />"""
 xml_text_5 = "<message>This is correct</Message>"
 xml_text_6 = "<b><i>This text is bold and italic</b></i>"
-xml_text_7 = "<b><i>This text is bold and italic</i></b>"
+xml_text_7 = "<response><i>This text is bold and italic</i></response>"
 xml_text_8 = """
 <note date=12/11/2007>
   <to>Tove</to>
   <from>Jani</from>
 </note>"""
 xml_text_9 = """
-<note date="12/11/2007">
+<response date="12/11/2007">
   <to>Tove</to>
+  response
   <from>Jani</from>
-</note>"""
+</response>"""
 xml_text_10 = """<message>salary < 1000</message>"""
-xml_text_11 = """<message>salary &lt; 1000</message>"""
+xml_text_11 = """<Response>salary &lt; 1000</Response>"""
 
 
-@pytest.mark.parametrize("text, expected", [
-    (xml_text_1, True),
-    (xml_text_2, False),  # all elements must have a root
-    (xml_text_3, False),  # prolog must come first if it exists
-    (xml_text_4, False),  # elements must have a closing tag
-    (xml_text_5, False),  # tags are case-sensitive
-    (xml_text_6, False),  # tags must be nested properly
-    (xml_text_7, True),
-    (xml_text_8, False),  # attribute values must be quoted
-    (xml_text_9, True),
-    (xml_text_10, False),  # entity references are required for special characters
-    (xml_text_11, True),
+@pytest.mark.parametrize("text, expected, response", [
+    (xml_text_1, True, 'This is the response'),
+    (xml_text_2, False, None),  # all elements must have a root
+    (xml_text_3, False, None),  # prolog must come first if it exists
+    (xml_text_4, False, None),  # elements must have a closing tag
+    (xml_text_5, False, None),  # tags are case-sensitive
+    (xml_text_6, False, None),  # tags must be nested properly
+    (xml_text_7, False, None),
+    (xml_text_8, False, None),  # attribute values must be quoted
+    (xml_text_9, True, ''),
+    (xml_text_10, False, None),  # entity references are required for special characters
+    (xml_text_11, True, 'salary < 1000'),
 ])
-def test_xml(text, expected):
+def test_xml(text, expected, response):
     constraint = OutputFormatConstraint(OutputType.XML)
     assert constraint.validate(text) == expected
+    assert constraint.response == response
 
     # confirm correct violation is recorded
     if not expected:
         assert len(constraint.violations) == 1
-        assert constraint.violations[0] == "The response is not in xml format."
+        assert constraint.violations[0] == "The response is not in the requested format."
 
 
 wrap_1 = "###"
@@ -168,26 +172,38 @@ fail
 {wrap_6}-"""
 
 
-@pytest.mark.parametrize("text, wrap_text, wrap_lines, expected", [
-    (wrap_text_1, wrap_1, 3, True),
-    (wrap_text_2, wrap_2, 3, True),
-    (wrap_text_2, wrap_2, 2, False),  # wrap_lines is too small
-    (wrap_text_3, wrap_3, 3, True),
-    (wrap_text_4, wrap_4, 2, False),  # wrap text only at start
-    (wrap_text_5, wrap_5, 1, False),  # wrap text only at end
-    (wrap_text_6, wrap_6, 2, False)
+@pytest.mark.parametrize("text, wrap_text, wrap_lines, expected, response", [
+    (wrap_text_1, wrap_1, 3, True, '\nhello\nworld\n'),
+    (wrap_text_2, wrap_2, 3, True, 'Sure, thing. Here\'s my response\n\n\nleggo\nmy\neggo\n'),
+    (wrap_text_2, wrap_2, 2, False, None),  # wrap_lines is too small
+    (wrap_text_3, wrap_3, 3, True, 'foo bar\nbaz\n1234329487'),
+    (wrap_text_4, wrap_4, 2, False, None),  # wrap text only at start
+    (wrap_text_5, wrap_5, 1, False, None),  # wrap text only at end
+    (wrap_text_6, wrap_6, 2, False, None)
 ])
-def test_wrap(text, wrap_text, wrap_lines, expected):
+def test_wrap(text, wrap_text, wrap_lines, expected, response):
     constraint = OutputFormatConstraint(OutputType.WRAP, wrap_text, wrap_lines)
     assert constraint.validate(text) == expected
+    assert constraint.response == response
 
     # confirm correct violation is recorded
     if not expected:
         assert len(constraint.violations) == 1
-        assert constraint.violations[0] == "The response is not in wrap format."
+        assert constraint.violations[0] == "The response is not in the requested format."
 
 
 def test_exceptions():
     with pytest.raises(ValueError):
         OutputFormatConstraint(OutputType.WRAP, "")
         OutputFormatConstraint("test")
+
+
+@pytest.mark.parametrize("output_type, wrap_text, expected", [
+    (OutputType.JSON, "", "The response must be given in JSON format. There should be a 'Response' key with corresponding value equal to the response."),
+    (OutputType.YAML, "", "The response must be given in YAML format. There should be a 'Response' key with corresponding value equal to the response."),
+    (OutputType.XML, "", "The response must be given in XML format. The root tag should be named 'Response' and should directly enclose the response."),
+    (OutputType.WRAP, "####", "The response must be enclosed in '####' characters. That is, the response should start and end with '####'.")
+])
+def test_description_text(output_type, wrap_text, expected):
+    constraint = OutputFormatConstraint(output_type, wrap_text)
+    assert constraint.description == expected

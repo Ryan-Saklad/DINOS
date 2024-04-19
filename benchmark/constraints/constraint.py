@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from utils.problem_type import ProblemType
 
 class Constraint(ABC):
     def __init__(self, description: str = "") -> None:
@@ -6,10 +7,14 @@ class Constraint(ABC):
         self.violations: list[str] = []
         self.category = ""
 
+        self.problem_type: ProblemType = ProblemType.ELEMENT_CONSTRAINT
+
     @abstractmethod
     def validate(self, response: str) -> bool:
         pass
 
-    @classmethod
-    def get_category(self) -> str:
-        return self.category
+    def get_description(self) -> str:
+        return self.description
+
+    def get_violations(self) -> list[str]:
+        return self.violations
