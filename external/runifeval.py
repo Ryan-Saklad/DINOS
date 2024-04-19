@@ -7,6 +7,9 @@ import subprocess
 import time
 import pandas as pd
 from misc.utils.openrouter_utils import generate_response
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 # update these paths if the relative path instruction_following_eval/ changes
@@ -41,7 +44,7 @@ def generate_responses(model: str, input_data: list) -> tuple[list, set]:
         response = None
         prompt_count = 0
         while response is None and prompt_count < 3:
-            response = generate_response(messages=messages, model=model)
+            response = generate_response(messages=messages, model=model, api_key=os.environ['OPENROUTER_API_KEY'])
             if response is None:
                 time.sleep(1)  # the primary source of errors is rate limiting
             prompt_count += 1

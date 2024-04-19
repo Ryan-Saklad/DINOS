@@ -1,22 +1,16 @@
-import os
 import json
 import requests
-from dotenv import load_dotenv
-
-load_dotenv()
-
-MODEL = 'mistralai/mistral-7b-instruct:nitro'
+import csv
 
 
-def generate_response(messages: list, model: str) -> str | None:
+def generate_response(messages: list, model: str, api_key: str) -> str | None:
     """Generate a response using the OpenRouter service"""
-    OPENROUTER_API_KEY = os.environ['OPENROUTER_API_KEY']
 
     try:
         response = requests.post(
             url="https://openrouter.ai/api/v1/chat/completions",
             headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Authorization": f"Bearer {api_key}",
             },
             data = json.dumps({
                 "model": model,
@@ -35,9 +29,11 @@ def generate_response(messages: list, model: str) -> str | None:
     return result
 
 
-def main():
-    pass
+def read_dinos_csv(file_path: str) -> list[str]:
+    contents = list()
+    with open(file_path, newline='') as csvfile:
+        csv_reader = csv.reader(csvfile, delimiter=',')
+        for row in csv_reader:
+            contents.append(row[0])
 
-
-if __name__ == '__main__':
-    main()
+    return contents
