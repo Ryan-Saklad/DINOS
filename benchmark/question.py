@@ -63,7 +63,6 @@ class Question:
             self.prompt = "Please generate a response that satisfies the following constraints:\n- " + "\n- ".join(task_descriptions)
         else:
             self.prompt = "Please generate a response that satisfies the following constraints:\n- Topic: {topic}\n- ".format(topic=self.topic) + "\n- ".join(task_descriptions)
-
     def evaluate_response(self, response: str, seed: str | None = None) -> tuple[bool, list[str]]:
         def validate_topic_with_llm() -> bool:
             import json

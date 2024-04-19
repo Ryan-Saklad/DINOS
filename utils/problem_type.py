@@ -1,6 +1,8 @@
 from enum import Enum, auto
 
 class ProblemType(Enum):
-    ELEMENT_CONSTRAINT = auto()
-    OUTPUT_FORMAT = auto()
-    PROBLEM = auto()
+    ELEMENT_CONSTRAINT = "ELEMENT_CONSTRAINT"
+    OUTPUT_FORMAT = "OUTPUT_FORMAT"
+    PROBLEM = "PROBLEM"
+    def __str__(self):
+        return self.value

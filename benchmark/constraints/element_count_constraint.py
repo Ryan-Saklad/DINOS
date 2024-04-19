@@ -1,9 +1,11 @@
 from benchmark.constraints.constraint import Constraint
 from utils.element_type import ElementType
 from utils.count_elements import count_elements
+from utils.problem_type import ProblemType
 
 class ElementCountConstraint(Constraint):
-    category = "Element Constraint"
+    # initialize from the parent class
+    problem_type = ProblemType.ELEMENT_CONSTRAINT
     def __init__(self, element_type: ElementType, element: str | None = None, min_count: int | None = None, max_count: int | None = None, exact_count: int | None = None, case_sensitive: bool = True) -> None:
         """
         Initializes the element count constraint with specific counts for validation.
@@ -32,7 +34,6 @@ class ElementCountConstraint(Constraint):
         self.max_count: int | None = max_count
         self.exact_count: int | None = exact_count
         self.case_sensitive: bool = case_sensitive
-        self.category = "Element Constraint"
         
         description_parts = [f"{element_type.name.lower()} count constraint:"]
         if element:
@@ -48,7 +49,7 @@ class ElementCountConstraint(Constraint):
             description_parts.append("case-insensitive")
         description = " ".join(description_parts)
         super().__init__(description)
-
+    
     def validate(self, response: str) -> bool:
         """
         Validates if the number of elements or occurrences of a specific element in the response meets the specified count constraints.

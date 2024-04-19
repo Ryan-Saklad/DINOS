@@ -1,9 +1,10 @@
 from benchmark.constraints.constraint import Constraint
 from utils.element_type import ElementType
 from utils.split_elements import split_elements
+from utils.problem_type import ProblemType
 
 class ElementRepetitionConstraint(Constraint):
-    category = "Element Constraint"
+    problem_type = ProblemType.ELEMENT_CONSTRAINT
     def __init__(self, element_type: ElementType, element: str, min_repetitions: int = None, max_repetitions: int = None, scope_type: ElementType = ElementType.PARAGRAPHS, case_sensitive: bool = True) -> None:
         """
         Initializes the element repetition constraint.
@@ -34,7 +35,6 @@ class ElementRepetitionConstraint(Constraint):
         self.max_repetitions: int = max_repetitions
         self.scope_type: ElementType = scope_type
         self.case_sensitive: bool = case_sensitive
-        self.category = "Element Constraint"
 
         description = f"The {element_type.name.lower()[:-1]} '{element}' should"
         if min_repetitions is not None and max_repetitions is not None:

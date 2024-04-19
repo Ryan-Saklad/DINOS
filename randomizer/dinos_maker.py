@@ -5,6 +5,7 @@ from benchmark.constraints.element_frequency_constraint import ElementFrequencyC
 from benchmark.constraints.element_length_pattern_constraint import ElementLengthPatternConstraint
 from benchmark.constraints.element_repetition_constraint import ElementRepetitionConstraint
 from benchmark.constraints.fibonacci_sequence_constraint import FibonacciSequenceConstraint
+from benchmark.constraints.isogram_constraint import IsogramConstraint
 from benchmark import question
 import random
 
@@ -61,13 +62,20 @@ def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, cons
                     element = random.choice(random_word_list)
                 choice = constraint_gatherer.randomizer()
                 if choice > 0.5 : 
-                    min_count = random.randint(1, 100)
-                    max_count = min_count + random.randint(1, 50)
+                    if element_type == ElementType.WORDS :
+                        min_count = random.randint(1, 5)
+                        max_count = min_count + random.randint(1, 10)
+                    else :
+                        min_count = random.randint(1, 25)
+                        max_count = min_count + random.randint(1, 25)
                     exact_count = None
                 else : 
                     min_count = None
                     max_count = None
-                    exact_count = random.randint(1, 100)
+                    if element_type == ElementType.WORDS :
+                        exact_count = random.randint(1, 15)
+                    else :
+                        exact_count = random.randint(1, 75)
                 case_sensitive_choice = random.choice(case_sensitive)
                 current_constraint = ElementCountConstraint(element_type, element, min_count, max_count, exact_count, case_sensitive_choice)
             elif i == ElementFrequencyConstraint : 
@@ -91,7 +99,10 @@ def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, cons
                 increasing = random.choice([True, False])
                 choice = constraint_gatherer.randomizer()
                 if choice > 0.5 : 
-                    min_length_diff = random.randint(1, 50)
+                    if element_type == ElementType.WORDS :
+                        min_length_diff = random.randint(1, 10)
+                    else :
+                        min_length_diff = random.randint(1, 25)
                 else : 
                     min_length_diff = 1
                 current_constraint = ElementLengthPatternConstraint(element_type, scope_type, increasing, min_length_diff)
@@ -109,13 +120,23 @@ def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, cons
                 case_sensitive_choice = random.choice(case_sensitive)
                 choice = constraint_gatherer.randomizer()
                 if choice > 0.5 : 
-                    min_repetitions = random.randint(1, 100)
-                    max_repetitions = min_repetitions + random.randint(1, 50)
+                    if element_type == ElementType.WORDS :
+                        min_repetitions = random.randint(1, 5)
+                        max_repetitions = min_repetitions + random.randint(1, 10)
+                    else :
+                        min_repetitions = random.randint(1, 25)
+                        max_repetitions = min_repetitions + random.randint(1, 25)
                 elif choice >= 0.25 : 
                     min_repetitions = None
-                    max_repetitions = random.randint(1, 100)
+                    if element_type == ElementType.WORDS :
+                        max_repetitions = random.randint(1, 15)
+                    else :
+                        max_repetitions = random.randint(1, 50)
                 else : 
-                    min_repetitions = random.randint(1, 100)
+                    if element_type == ElementType.WORDS :
+                        min_repetitions = random.randint(1, 15)
+                    else :
+                        min_repetitions = random.randint(1, 50)
                     max_repetitions = None
                 current_constraint = ElementRepetitionConstraint(element_type, element, min_repetitions, max_repetitions, scope_type, case_sensitive_choice)
             elif i == FibonacciSequenceConstraint:
