@@ -1,4 +1,5 @@
 from utils.element_type import ElementType
+from utils.output_type import OutputType
 from randomizer import constraint_gatherer
 from benchmark.constraints.element_count_constraint import ElementCountConstraint
 from benchmark.constraints.element_frequency_constraint import ElementFrequencyConstraint
@@ -6,10 +7,14 @@ from benchmark.constraints.element_length_pattern_constraint import ElementLengt
 from benchmark.constraints.element_repetition_constraint import ElementRepetitionConstraint
 from benchmark.constraints.fibonacci_sequence_constraint import FibonacciSequenceConstraint
 from benchmark.constraints.isogram_constraint import IsogramConstraint
+from benchmark.constraints.output_format_constraint import OutputFormatConstraint
+from benchmark.constraints.palindrome_constraint import PalindromeConstraint
+from benchmark.constraints.write_backwards_constraint import WriteBackwardsConstraint
 from benchmark import question
 import random
 
-initial_constraints = [ElementCountConstraint, ElementFrequencyConstraint, ElementLengthPatternConstraint, ElementRepetitionConstraint, FibonacciSequenceConstraint]
+initial_constraints = [ElementCountConstraint, ElementFrequencyConstraint, ElementLengthPatternConstraint, ElementRepetitionConstraint, FibonacciSequenceConstraint, IsogramConstraint
+                       , OutputFormatConstraint, PalindromeConstraint, WriteBackwardsConstraint]
 element_types = [ElementType.WORDS, ElementType.CHARACTERS, ElementType.SENTENCES, ElementType.PARAGRAPHS]
 count_type = ["exact_count", "range_count"]
 case_sensitive = [True, False]
@@ -142,6 +147,20 @@ def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, cons
             elif i == FibonacciSequenceConstraint:
                 element_type = random.choice(element_types)
                 current_constraint = FibonacciSequenceConstraint(element_type)
+            elif i == IsogramConstraint: 
+                current_constraint = IsogramConstraint()
+            elif i == OutputFormatConstraint:
+                wrap_text = ""
+                output_type = random.choice([OutputType.JSON, OutputType.YAML, OutputType.XML, OutputType.WRAP])
+                wrap_lines = random.randint(1, 5)
+                if output_type == OutputType.WRAP:
+                    wrap_text = random.choice(["###", "$$$", "!!!", "&&&"])
+                current_constraint = OutputFormatConstraint(output_type, wrap_text, wrap_lines)
+            elif i == PalindromeConstraint:
+                current_constraint = PalindromeConstraint()
+            elif i == WriteBackwardsConstraint:
+                current_constraint = WriteBackwardsConstraint()
+
             single_run_prompts.append(current_constraint)
         if topic : 
             q = question.Question(constraints= single_run_prompts, topic = random.choice(topics))

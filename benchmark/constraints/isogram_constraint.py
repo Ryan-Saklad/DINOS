@@ -1,9 +1,10 @@
 import string
 
 from benchmark.constraints.constraint import Constraint
-
+from utils.problem_type import ProblemType
 
 class IsogramConstraint(Constraint):
+    problem_type = ProblemType.ELEMENT_CONSTRAINT
     """
     This constraint requires the models response to only use isograms. An
     isogram is a word that does not contain repeating letters.
