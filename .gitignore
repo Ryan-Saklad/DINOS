@@ -16,10 +16,11 @@ random_prompts.csv
 random_prompts.pkl
 model_responses*.csv
 evaluation_results*.csv
+evaluations/
 *.zip
 
 # PyCharm
 .idea/
 
 # MacOS
-.DS_store
+.DS_Store

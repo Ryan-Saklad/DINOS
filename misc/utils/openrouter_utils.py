@@ -74,6 +74,12 @@ def write_dinos_csv(file_path: str, contents: list[list[str]]) -> None:
             csv_writer.writerow(row)
 
 
+def read_dinos_json(file_path: str) -> dict[dict, dict]:
+    with open(file_path) as jsonfile:
+        contents = json.load(jsonfile)
+        return contents
+
+
 def get_model_name(openrouter_model_name: str) -> str:
     """Use to strip characters that cause issues with filenames and paths"""
     model_name = openrouter_model_name.split('/')[-1]
