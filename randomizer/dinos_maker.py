@@ -184,7 +184,7 @@ def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, cons
             if current_constraint : 
                 single_run_prompts.append(current_constraint)
         if topic and single_run_prompts : 
-            topic_class = TopicPicker('misc/topics.txt', seed)
+            topic_class = TopicPicker('misc/topics.txt', seed + num_runs)
             topic_data = topic_class.create_topic_data_structure()
             topic = topic_class.select_new_topic(topic_data)
             q = question.Question(constraints= single_run_prompts, topic = topic)
@@ -192,9 +192,9 @@ def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, cons
             q = question.Question(constraints= single_run_prompts)
         if single_run_prompts :
             q.generate_prompt(seed=seed, use_llm=llm)
-            prompts.append((q.prompt, constraint_type))
+            prompts.append((q.prompt, current_constraint.problem_type))
             prompts_object.append(q)
         else : 
-            prompts.append((prompt, constraint_type))
+            prompts.append((prompt, problem.problem_type))
             prompts_object.append(problem)
     return prompts, prompts_object
