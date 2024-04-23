@@ -16,6 +16,7 @@ from benchmark.problems.liar_problem import LiarProblem
 from benchmark.problems.math_expression_problem import MathExpressionProblem
 from benchmark.problems.navigate_problem import NavigateProblem
 from benchmark import question
+from misc.wiki_topic_picker import TopicPicker
 import random
 
 initial_constraints = [ElementCountConstraint, ElementFrequencyConstraint, ElementLengthPatternConstraint, ElementRepetitionConstraint, FibonacciSequenceConstraint, IsogramConstraint
@@ -32,28 +33,6 @@ random_word_list = [
     "water", "think", "ride", "color", "dream", "see" 
 ]
 char_list = [chr(i) for i in range(97, 123)]
-topics = [
-    "vegetables", "cheese", "banking", "hammocks", "basketball", 
-    "games", "meteorology", "tattoos", "barbers", "pork", 
-    "coffin", "farmers markets", "weaving", "Central America", 
-    "dentistry", "post office", "alligators", "boats", "pineapple", 
-    "royalty", "windmills", "cotton", "playing cards", "seashells", 
-    "flood", "giants", "Disney movies", "money", "military", 
-    "shipwrecks", "postcards", "coins", "gorillas", "camels", 
-    "firemen", "veterinarians", "athletics", "banana", "slavery", 
-    "sailing", "football", "pipe organs", "communism", "Africa",
-    "skull", "vaccines", "accordions", "beekeeping", "cats", 
-    "paper boys", "balloons", "potatoes", "bears", "spinning", 
-    "magicians", "World War 1", "Europe", "buffaloes", "smoking",
-    "Salvation Army", "criminals", "pipes", "spas", "bread", 
-    "Red Cross", "insects", "zeppelins", "drugstores", "South America",
-    "parachuting", "shells", "giraffes", "baseball", "frogs", 
-    "boxing", "lions", "motorcycles", "sewing machines", "hunting", 
-    "earthquake", "pottery", "printing", "masonry", "justice", 
-    "rice", "mountaineering", "pilots", "hotels", "music", 
-    "fencing", "bridges", "rugby", "journalism", "shoes", 
-    "snakes", "engineering", "horses", "cards", "spiritism", "cemetery"
-]
 
 
 def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, constraint_type = None, llm = False) : 
@@ -205,7 +184,10 @@ def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, cons
             if current_constraint : 
                 single_run_prompts.append(current_constraint)
         if topic and single_run_prompts : 
-            q = question.Question(constraints= single_run_prompts, topic = random.choice(topics))
+            topic_class = TopicPicker('misc/topics.txt', seed)
+            topic_data = topic_class.create_topic_data_structure()
+            topic = topic_class.select_new_topic(topic_data)
+            q = question.Question(constraints= single_run_prompts, topic = topic)
         elif single_run_prompts : 
             q = question.Question(constraints= single_run_prompts)
         if single_run_prompts :
