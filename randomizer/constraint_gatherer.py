@@ -34,7 +34,7 @@ def gather_constraints(list_of_constraints, seed = None, num_constraints = -1, c
                 else : 
                     constraints.append(constraint)
     else: 
-        if constraint_type == 1 :
+        if num_constraints == 1 :
             list_of_constraints = list_of_constraints + problem_list
         if constraint_type : 
             constraints = random.sample([constraint for constraint in list_of_constraints if str(constraint.problem_type) == constraint_type], num_constraints)

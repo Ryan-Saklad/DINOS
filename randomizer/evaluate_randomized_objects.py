@@ -19,7 +19,10 @@ def evaluate_prompts(args) :
         prompt_objects = pickle.load(f)
     results = []
     for prompt in range(len(prompt_objects)) : 
-        results.append(prompt_objects[prompt].evaluate_response(model_responses[prompt]))
+        if isinstance(prompt_objects[prompt], question.Question) :
+            results.append(prompt_objects[prompt].evaluate_response(model_responses[prompt]))
+        else : 
+            results.append((prompt_objects[prompt].validate(model_responses[prompt]),None,None,None))
     df = pd.DataFrame(results, columns = ['Correctness', 'Violated Constraints', 'Partial Correctness', 'Satisfied Constraints'])
     df.to_csv(args.output, index = False)
     print("Evaluation results saved to", args.output)
