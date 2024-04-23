@@ -27,17 +27,19 @@ def gather_constraints(list_of_constraints, seed = None, num_constraints = -1, c
     # Randomly select constraints to add
     if num_constraints == -1 :
         for constraint in list_of_constraints : 
-            if randomizer() > 0.5 : 
-                if constraint_type : 
-                    if constraint_type == str(constraint.problem_type) : 
-                        constraints.append(constraint)
+            if randomizer() > 0.5 :
+                if constraint_type :
+                    for ct in constraint_type :  
+                        if ct == str(constraint.problem_type) : 
+                            constraints.append(constraint)
+                            break
                 else : 
                     constraints.append(constraint)
     else: 
         if num_constraints == 1 :
             list_of_constraints = list_of_constraints + problem_list
         if constraint_type : 
-            constraints = random.sample([constraint for constraint in list_of_constraints if str(constraint.problem_type) == constraint_type], num_constraints)
+            constraints = random.sample([constraint for constraint in list_of_constraints if str(constraint.problem_type) in constraint_type], num_constraints)
         else :
             constraints = random.sample(list_of_constraints, num_constraints)
     return constraints

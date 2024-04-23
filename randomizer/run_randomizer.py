@@ -10,7 +10,7 @@ parser.add_argument('--topic', action='store_true', help='Include a topic in the
 parser.add_argument('--seed', type=int, default=None, help='Seed for random number generator')
 parser.add_argument('--output', type=str, default='random_prompts.json', help='Output file path for the prompts')
 parser.add_argument('--num_per_prompt', type=int, default=-1, help='Number of constraints per prompt, defaults to no limit')
-parser.add_argument('--constraint_type', type=str, default=None, help='Type of constraint to generate, defaults to random', choices = list(ProblemType.__members__.keys()))
+parser.add_argument('--constraint_type', type=str, default=[], nargs="*", help='Type of constraint to generate, defaults to random', choices = list(ProblemType.__members__.keys()))
 parser.add_argument('--config', type=str, default=None, help='Path to a config file') # Ignores all other arguments if provided
 parser.add_argument('--llm', action = 'store_true', help = 'Use a GPT 3.5 instance to generate prompts instead of static')
 
@@ -41,7 +41,7 @@ def run_prompt_generator(args) :
         num_per_prompt = int(config.get('num_per_prompt'))
         constraint_type = config.get('constraint_type')
         if constraint_type == 'None' : 
-            constraint_type = None
+            constraint_type = []
         output = config.get('output', 'random_prompts.csv')
         prompts, objects = dinos_maker.make_prompts(seed, num_prompts, topic, num_per_prompt, constraint_type, llm)
     # Save the prompts to a csv file

@@ -36,7 +36,7 @@ random_word_list = [
 char_list = [chr(i) for i in range(97, 123)]
 
 
-def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, constraint_type = None, llm = False) : 
+def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, constraint_type = [], llm = False) : 
     constraint_gatherer.set_seed(seed)
     prompts = []
     prompts_object = []
@@ -192,6 +192,8 @@ def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, cons
         elif single_run_prompts : 
             q = question.Question(constraints= single_run_prompts)
         if single_run_prompts :
+            print(current_constraint)
+            print(current_constraint.problem_type)
             q.generate_prompt(seed=seed, use_llm=llm)
             prompts.append((q.prompt, current_constraint.problem_type))
             prompts_object.append(q)

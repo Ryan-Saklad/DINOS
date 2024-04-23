@@ -33,9 +33,8 @@ class OutputFormatConstraint(Constraint):
         self.wrap_text: str | None = wrap_text
         self.wrap_lines: int = wrap_lines
         self.response: str | None = None
-        self.problem_type = ProblemType.OUTPUT_FORMAT
-
         super().__init__(self.get_description())
+        self.problem_type = ProblemType.OUTPUT_FORMAT
 
     def validate(self, response: str) -> bool:
         """
