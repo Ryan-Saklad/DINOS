@@ -18,6 +18,7 @@ from benchmark.problems.navigate_problem import NavigateProblem
 from benchmark import question
 from misc.wiki_topic_picker import TopicPicker
 import random
+from tqdm import tqdm
 
 initial_constraints = [ElementCountConstraint, ElementFrequencyConstraint, ElementLengthPatternConstraint, ElementRepetitionConstraint, FibonacciSequenceConstraint, IsogramConstraint
                        , OutputFormatConstraint, PalindromeConstraint, WriteBackwardsConstraint, BooleanExpressionProblem, DyckLanguageProblem, LiarProblem, MathExpressionProblem, NavigateProblem]
@@ -39,7 +40,7 @@ def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, cons
     constraint_gatherer.set_seed(seed)
     prompts = []
     prompts_object = []
-    for num_runs in range(num_prompts) : 
+    for num_runs in tqdm(range(num_prompts)) : 
         current_constraint = None
         constraints = constraint_gatherer.gather_constraints(initial_constraints, num_constraints = num_per_prompt, constraint_type = constraint_type)
         single_run_prompts = []
