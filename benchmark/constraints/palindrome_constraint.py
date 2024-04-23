@@ -1,7 +1,9 @@
 import string
 from benchmark.constraints.constraint import Constraint
+from utils.problem_type import ProblemType
 
 class PalindromeConstraint(Constraint):
+    problem_type = ProblemType.ELEMENT_CONSTRAINT
     """Requires a model to respond to a prompt with a palindrome."""
     def __init__(self) -> None:
         super().__init__('The response should be a palindrome.')

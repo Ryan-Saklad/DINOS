@@ -1,6 +1,8 @@
 from benchmark.constraints.constraint import Constraint
+from utils.problem_type import ProblemType
 
 class WriteBackwardsConstraint(Constraint):
+    problem_type = ProblemType.ELEMENT_CONSTRAINT
     """Requires a model to respond to a prompt with the text written backwards."""
     def __init__(self) -> None:
         super().__init__('The response should be the text written backwards.')

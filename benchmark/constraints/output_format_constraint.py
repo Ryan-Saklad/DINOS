@@ -7,6 +7,7 @@ from utils.output_type import OutputType
 from utils.problem_type import ProblemType
 
 class OutputFormatConstraint(Constraint):
+    problem_type = ProblemType.OUTPUT_FORMAT
     def __init__(self, output_type: OutputType, wrap_text: str = "", wrap_lines: int = 3):
         """
         Initializes the output format type constraint.
