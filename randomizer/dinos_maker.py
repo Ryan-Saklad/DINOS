@@ -88,13 +88,13 @@ def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, cons
                 element = random.choice(random_word_list)
                 choice = constraint_gatherer.randomizer()
                 if choice > 0.5 : 
-                    min_frequency = round(random.uniform(0, 1) * 100, 0)
-                    max_frequency = round(min(min_frequency + random.uniform(0, 1), 1)* 100, 0)
+                    min_frequency = round(random.uniform(0, 0.25) * 100, 0)
+                    max_frequency = round(min(min_frequency + random.uniform(0, 0.50), 1)* 100, 0) # max frequency is at most 100, calculated as min + random number between 0 and 1   
                 elif choice >= 0.25 : 
                     min_frequency = None
-                    max_frequency = round(random.uniform(0, 1) * 100, 0)
+                    max_frequency = round(random.uniform(0, 0.50) * 100, 0)
                 else : 
-                    min_frequency = round(random.uniform(0, 1) * 100, 0)
+                    min_frequency = round(random.uniform(0, 0.25) * 100, 0)
                     max_frequency = None
                 case_sensitive_choice = random.choice(case_sensitive)
                 current_constraint = ElementFrequencyConstraint(element_type, element, min_frequency, max_frequency, case_sensitive_choice)
