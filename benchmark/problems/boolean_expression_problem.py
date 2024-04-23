@@ -1,6 +1,8 @@
 from benchmark.problems.problem import Problem
+from utils.problem_type import ProblemType
 
 class BooleanExpressionProblem(Problem):
+    problem_type = ProblemType.PROBLEM
     def __init__(self) -> None:
         super().__init__()
         self.prompt: str = "Please evaluate the following boolean expression with 'True' or 'False' as the answer:"

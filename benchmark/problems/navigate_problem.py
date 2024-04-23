@@ -1,6 +1,8 @@
 from benchmark.problems.problem import Problem
+from utils.problem_type import ProblemType
 
 class NavigateProblem(Problem):
+    problem_type = ProblemType.PROBLEM
     def __init__(self) -> None:
         super().__init__()
         self.prompt: str = "After following each instruction, where do you end up? Provide your answer as a pair of coordinates (x, y), where you always face forward. "

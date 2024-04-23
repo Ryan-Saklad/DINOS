@@ -1,7 +1,9 @@
 from benchmark.problems.problem import Problem
 from utils.names import names
+from utils.problem_type import ProblemType
 
 class LiarProblem(Problem):
+    problem_type = ProblemType.PROBLEM
     def __init__(self) -> None:
         super().__init__()
         self.prompt: str = "Determine the truthfulness ('True' or 'False') of the last person based on the following statements:"

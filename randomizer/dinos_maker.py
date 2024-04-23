@@ -10,11 +10,16 @@ from benchmark.constraints.isogram_constraint import IsogramConstraint
 from benchmark.constraints.output_format_constraint import OutputFormatConstraint
 from benchmark.constraints.palindrome_constraint import PalindromeConstraint
 from benchmark.constraints.write_backwards_constraint import WriteBackwardsConstraint
+from benchmark.problems.boolean_expression_problem import BooleanExpressionProblem
+from benchmark.problems.dyck_language_problem import DyckLanguageProblem
+from benchmark.problems.liar_problem import LiarProblem
+from benchmark.problems.math_expression_problem import MathExpressionProblem
+from benchmark.problems.navigate_problem import NavigateProblem
 from benchmark import question
 import random
 
 initial_constraints = [ElementCountConstraint, ElementFrequencyConstraint, ElementLengthPatternConstraint, ElementRepetitionConstraint, FibonacciSequenceConstraint, IsogramConstraint
-                       , OutputFormatConstraint, PalindromeConstraint, WriteBackwardsConstraint]
+                       , OutputFormatConstraint, PalindromeConstraint, WriteBackwardsConstraint, BooleanExpressionProblem, DyckLanguageProblem, LiarProblem, MathExpressionProblem, NavigateProblem]
 element_types = [ElementType.WORDS, ElementType.CHARACTERS, ElementType.SENTENCES, ElementType.PARAGRAPHS]
 count_type = ["exact_count", "range_count"]
 case_sensitive = [True, False]
@@ -56,6 +61,7 @@ def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, cons
     prompts = []
     prompts_object = []
     for num_runs in range(num_prompts) : 
+        current_constraint = None
         constraints = constraint_gatherer.gather_constraints(initial_constraints, num_constraints = num_per_prompt, constraint_type = constraint_type)
         single_run_prompts = []
         for i in constraints : 
@@ -160,13 +166,53 @@ def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, cons
                 current_constraint = PalindromeConstraint()
             elif i == WriteBackwardsConstraint:
                 current_constraint = WriteBackwardsConstraint()
+            
+            elif i == BooleanExpressionProblem:
+                min_depth = random.randint(2, 5)
+                max_depth = random.randint(min_depth, 7)
+                problem = BooleanExpressionProblem()
+                problem.generate(min_depth, max_depth)
+                prompt = problem.prompt + problem.problem
+            elif i == DyckLanguageProblem:
+                min_length = random.randint(5, 10)
+                max_length = random.randint(min_length, 15)
+                problem = DyckLanguageProblem()
+                problem.generate(min_length, max_length)
+                prompt = problem.prompt + problem.problem
+            elif i == LiarProblem:
+                num_people = random.randint(3, 7)
+                problem = LiarProblem()
+                problem.generate(num_people)
+                prompt = problem.prompt + problem.problem
+            elif i == MathExpressionProblem:
+                min_depth = random.randint(2, 3)
+                max_depth = random.randint(min_depth, 4)
+                min_value = random.randint(-9, 9)
+                max_value = random.randint(min_value, 9)
+                min_sub_expressions = random.randint(2, 4)
+                max_sub_expressions = random.randint(min_sub_expressions, 5)
+                problem = MathExpressionProblem()
+                problem.generate(min_depth, max_depth, min_value, max_value, min_sub_expressions, max_sub_expressions)
+                prompt = problem.prompt + problem.problem
+            elif i == NavigateProblem:
+                num_steps = random.randint(5, 10)
+                min_distance = random.randint(1, 5)
+                max_distance = random.randint(min_distance, 10)
+                problem = NavigateProblem()
+                problem.generate(num_steps, min_distance, max_distance)
+                prompt = problem.prompt + problem.problem
 
-            single_run_prompts.append(current_constraint)
-        if topic : 
+            if current_constraint : 
+                single_run_prompts.append(current_constraint)
+        if topic and single_run_prompts : 
             q = question.Question(constraints= single_run_prompts, topic = random.choice(topics))
-        else : 
+        elif single_run_prompts : 
             q = question.Question(constraints= single_run_prompts)
-        q.generate_prompt(seed=seed, use_llm=llm)
-        prompts.append((q.prompt, constraint_type))
-        prompts_object.append(q)
+        if single_run_prompts :
+            q.generate_prompt(seed=seed, use_llm=llm)
+            prompts.append((q.prompt, constraint_type))
+            prompts_object.append(q)
+        else : 
+            prompts.append((prompt, constraint_type))
+            prompts_object.append(problem)
     return prompts, prompts_object

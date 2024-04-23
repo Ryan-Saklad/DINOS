@@ -1,4 +1,12 @@
 import random
+from benchmark.problems.boolean_expression_problem import BooleanExpressionProblem
+from benchmark.problems.dyck_language_problem import DyckLanguageProblem
+from benchmark.problems.liar_problem import LiarProblem
+from benchmark.problems.math_expression_problem import MathExpressionProblem
+from benchmark.problems.navigate_problem import NavigateProblem
+
+
+problem_list = [BooleanExpressionProblem, DyckLanguageProblem, LiarProblem, MathExpressionProblem, NavigateProblem]
 
 def randomizer() : 
     # Return a random number between 0 and 1
@@ -26,6 +34,8 @@ def gather_constraints(list_of_constraints, seed = None, num_constraints = -1, c
                 else : 
                     constraints.append(constraint)
     else: 
+        if constraint_type == 1 :
+            list_of_constraints = list_of_constraints + problem_list
         if constraint_type : 
             constraints = random.sample([constraint for constraint in list_of_constraints if str(constraint.problem_type) == constraint_type], num_constraints)
         else :

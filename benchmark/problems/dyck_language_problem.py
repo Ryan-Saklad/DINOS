@@ -1,6 +1,8 @@
 from benchmark.problems.problem import Problem
+from utils.problem_type import ProblemType
 
 class DyckLanguageProblem(Problem):
+    problem_type = ProblemType.PROBLEM
     def __init__(self) -> None:
         super().__init__()
         self.prompt: str = "Complete the following sequence, ensuring the parentheses are properly closed:"
