@@ -46,7 +46,7 @@ def run_prompt_generator(args) :
         prompts, objects = dinos_maker.make_prompts(seed, num_prompts, topic, num_per_prompt, constraint_type, llm)
     # Save the prompts to a csv file
     df = pd.DataFrame(prompts, columns = ['Prompt', "Constraint Type"])
-    df.to_json(args.output)
+    df.to_json(args.output, default_handler=str)
     print("Prompts saved to", args.output)
     import pickle
     with open(args.output.replace('.json', '.pkl'), 'wb') as f:

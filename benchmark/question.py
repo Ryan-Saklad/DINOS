@@ -19,7 +19,7 @@ class Question:
             client: groq.GROQ = groq.Groq()
 
             model: str = "llama3-70b-8192"
-            system_prompt: str = "You are an expert prompt engineer. You will be given a topic and a list of constraints. Your task is to generate a prompt that clearly communicates the topic and each of the constraints to a LLM. Do not make assumptions about the prompt, add information, or remove information. Provide only the generated prompt in your response, formatted as a JSON object with a single 'prompt' field. Do not attempt to generate a response to the prompt itself. E.g., {'prompt': 'Put your prompt here.'}"
+            system_prompt: str = 'You are an expert prompt engineer. You will be given a topic and a list of constraints. Your task is to generate a prompt that clearly communicates the topic and each of the constraints to a LLM. Do not make assumptions about the prompt, add information, or remove information. Provide only the generated prompt in your response, formatted as a JSON object with a single "prompt" field. Do not attempt to generate a response to the prompt itself. E.g., {"prompt": "Put your prompt here."}'
 
             user_prompt: str = json.dumps({"topic": self.topic, "tasks": task_descriptions})
 
