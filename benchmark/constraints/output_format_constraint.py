@@ -36,7 +36,7 @@ class OutputFormatConstraint(Constraint):
         super().__init__(self.get_description())
         self.problem_type = ProblemType.OUTPUT_FORMAT
 
-    def validate(self, response: str) -> bool:
+    def validate(self, response: str, original_text: str = '') -> bool:
         """
         Validates if the given string is given in the expected output format. Upon successful validation,
         the model's response will be saved as the instance's response attribute.

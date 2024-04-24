@@ -42,7 +42,7 @@ class ElementFrequencyConstraint(Constraint):
         description = " ".join(description_parts)
         super().__init__(description)
 
-    def validate(self, response: str) -> bool:
+    def validate(self, response: str, original_text: str = '') -> bool:
         """
         Validates if the element frequency in the response meets the specified constraints.
         

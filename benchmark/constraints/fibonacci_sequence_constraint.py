@@ -29,7 +29,7 @@ class FibonacciSequenceConstraint(Constraint):
         description = f"The number of {element_type.name.lower()} in the response must be a Fibonacci number."
         super().__init__(description)
 
-    def validate(self, response: str) -> bool:
+    def validate(self, response: str, original_text: str = '') -> bool:
         """
         Validates if the number of elements in the response is a Fibonacci number.
         

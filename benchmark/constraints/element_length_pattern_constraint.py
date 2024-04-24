@@ -37,7 +37,7 @@ class ElementLengthPatternConstraint(Constraint):
         description += f" with a minimum length difference of {min_length_diff}"
         super().__init__(description)
 
-    def validate(self, response: str) -> bool:
+    def validate(self, response: str, original_text: str = '') -> bool:
         """
         Validates if the response satisfies the element length pattern constraint, not allowing same length as valid.
 

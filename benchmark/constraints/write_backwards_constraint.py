@@ -7,7 +7,7 @@ class WriteBackwardsConstraint(Constraint):
     def __init__(self) -> None:
         super().__init__('The response should be the text written backwards.')
 
-    def validate(self, response: str, original_text: str) -> bool:
+    def validate(self, response: str, original_text: str = '') -> bool:
         """
         Validates if the model's response is the original text written backwards.
 

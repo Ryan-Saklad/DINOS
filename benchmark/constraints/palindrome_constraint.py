@@ -8,7 +8,7 @@ class PalindromeConstraint(Constraint):
     def __init__(self) -> None:
         super().__init__('The response should be a palindrome.')
 
-    def validate(self, response: str) -> bool:
+    def validate(self, response: str, original_text: str = '') -> bool:
         """
         Validates the models response and saves the sequence if it is not a palindrome.
 

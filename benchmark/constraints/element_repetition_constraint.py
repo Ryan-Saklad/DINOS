@@ -47,7 +47,7 @@ class ElementRepetitionConstraint(Constraint):
         description += " (case-sensitive)" if case_sensitive else " (case-insensitive)"
         super().__init__(description)
 
-    def validate(self, response: str) -> bool:
+    def validate(self, response: str, original_text: str = '') -> bool:
         """
         Validates if the response satisfies the element repetition constraint.
         

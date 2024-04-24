@@ -10,7 +10,7 @@ class Constraint(ABC):
         self.problem_type: ProblemType = ProblemType.ELEMENT_CONSTRAINT
 
     @abstractmethod
-    def validate(self, response: str) -> bool:
+    def validate(self, response: str, original_text: str = '') -> bool:
         pass
 
     def get_description(self) -> str:
