@@ -40,7 +40,7 @@ class BooleanExpressionProblem(Problem):
         return str(eval(expression))
 
     def validate(self, response: str) -> bool:
-        return self.answer == response
+        return self.answer == self.strip_boilerplate(response)
 
     def get_description(self, include_problem: bool = True) -> str:
         if include_problem:

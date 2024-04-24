@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
+from benchmark.benchmark_task import BenchmarkTask
 from utils.problem_type import ProblemType
 
-class Constraint(ABC):
+class Constraint(BenchmarkTask):
     def __init__(self, description: str = "") -> None:
+        super().__init__()
         self.description = description
         self.violations: list[str] = []
         self.category = ""

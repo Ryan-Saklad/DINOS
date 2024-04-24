@@ -47,7 +47,8 @@ class ElementLengthPatternConstraint(Constraint):
         Returns:
             bool: True if the response satisfies the element length pattern constraint with no same lengths allowed, False otherwise.
         """
-        scopes: list[str] = split_elements(response, self.scope_type)
+        fmt_response = self.strip_boilerplate(response)
+        scopes: list[str] = split_elements(fmt_response, self.scope_type)
         lengths: list[int] = [count_elements(scope, self.element_type) for scope in scopes]
 
         valid: bool = True

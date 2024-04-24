@@ -68,7 +68,7 @@ def read_dinos_csv(file_path: str) -> list[str]:
 
 
 def write_dinos_csv(file_path: str, contents: list[list[str]]) -> None:
-    with open(file_path, 'a+') as csvfile:
+    with open(file_path, 'a+', newline='') as csvfile:
         csv_writer = csv.writer(csvfile, delimiter=',')
         for row in contents:
             csv_writer.writerow(row)

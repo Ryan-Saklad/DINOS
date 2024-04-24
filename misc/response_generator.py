@@ -8,14 +8,16 @@ load_dotenv()
 OPENROUTER_API_KEY = os.environ['OPENROUTER_API_KEY']
 MODELS = [
     'mistralai/mistral-7b-instruct:nitro',
-    'google/gemma-7b-it:nitro',
     'mistralai/mixtral-8x7b-instruct:nitro',
+    'mistralai/mixtral-8x22b-instruct',
+    'anthropic/claude-3-haiku',
+    'google/gemma-7b-it:nitro',
     'huggingfaceh4/zephyr-7b-beta',
     'meta-llama/llama-3-8b-instruct:nitro',
     'meta-llama/llama-3-70b-instruct:nitro'
 ]
 EVALUATION_DIR = os.path.join('evaluations', 'evaluation-20240423')
-target_model = MODELS[5]
+target_model = MODELS[3]
 model_name = openrouter_utils.get_model_name(target_model)
 prompts_json = os.path.join(EVALUATION_DIR, 'random_prompts.json')
 curr_date = datetime.today().strftime('%F')

@@ -6,21 +6,21 @@ from utils.element_type import ElementType
 # Test Cases
 @pytest.mark.parametrize("text, element_type, element, min_frequency, max_frequency, case_sensitive, expected", [
    # Test case for case-insensitive character frequency within range
-   ("Hello", ElementType.CHARACTERS, "l", 0.3, 0.5, False, True),
+   ("Sure, here you go!\nHello", ElementType.CHARACTERS, "l", 0.3, 0.5, False, True),
    # Test case for case-sensitive character frequency within range
-   ("Hello", ElementType.CHARACTERS, "L", 0.2, 0.4, True, False),
+   ("Sure, here you go!\nHello", ElementType.CHARACTERS, "L", 0.2, 0.4, True, False),
    # Test case for case-insensitive word frequency above minimum
-   ("OpenAI ChatGPT", ElementType.WORDS, "chatgpt", 0.1, None, False, True),
+   ("Sure, here you go!\nOpenAI ChatGPT", ElementType.WORDS, "chatgpt", 0.1, None, False, True),
    # Test case for case-sensitive word frequency above minimum
-   ("OpenAI ChatGPT", ElementType.WORDS, "ChatGPT", 0.1, None, True, True),
+   ("Sure, here you go!\nOpenAI ChatGPT", ElementType.WORDS, "ChatGPT", 0.1, None, True, True),
    # Test case for case-insensitive character frequency below maximum
-   ("Anthropic", ElementType.CHARACTERS, "i", None, 0.2, False, True),
+   ("Sure, here you go!\nAnthropic", ElementType.CHARACTERS, "i", None, 0.2, False, True),
    # Test case for case-sensitive character frequency below maximum
-   ("Anthropic", ElementType.CHARACTERS, "I", None, 0.2, True, True),
+   ("Sure, here you go!\nAnthropic", ElementType.CHARACTERS, "I", None, 0.2, True, True),
    # Test case for case-insensitive word frequency outside the range
-   ("Claude", ElementType.WORDS, "claude", 0.6, 0.8, False, False),
+   ("Sure, here you go!\nClaude", ElementType.WORDS, "claude", 0.6, 0.8, False, False),
    # Test case for case-sensitive word frequency outside the range
-   ("Claude", ElementType.WORDS, "Claude", 0.6, 0.8, True, False),
+   ("Sure, here you go!\nClaude", ElementType.WORDS, "Claude", 0.6, 0.8, True, False),
 ])
 def test_element_frequency(text, element_type, element, min_frequency, max_frequency, case_sensitive, expected):
    constraint = ElementFrequencyConstraint(element_type, element, min_frequency, max_frequency, case_sensitive)
@@ -49,11 +49,11 @@ def test_no_frequency_specified():
 # Test Case for Case-Sensitive Character Frequency
 def test_case_sensitive_character_frequency():
    constraint = ElementFrequencyConstraint(ElementType.CHARACTERS, "A", min_frequency=0.1, max_frequency=0.3, case_sensitive=True)
-   assert constraint.validate("Anthropic AI") == True
-   assert constraint.validate("anthropic ai") == False
+   assert constraint.validate("Sure, here you go!\nAnthropic AI") == True
+   assert constraint.validate("Sure, here you go!\nanthropic ai") == False
 
 # Test Case for Case-Insensitive Word Frequency
 def test_case_insensitive_word_frequency():
    constraint = ElementFrequencyConstraint(ElementType.WORDS, "openai", min_frequency=0.2, max_frequency=0.4, case_sensitive=False)
-   assert constraint.validate("OpenAI is an AI company") == True
-   assert constraint.validate("Openai Is An Ai Company") == True
+   assert constraint.validate("Sure, here you go!\nOpenAI is an AI company") == True
+   assert constraint.validate("Sure, here you go!\nOpenai Is An Ai Company") == True

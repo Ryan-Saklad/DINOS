@@ -18,6 +18,7 @@ class PalindromeConstraint(Constraint):
         Returns:
             bool: True if the response is a palindrome, False otherwise.
         """
-        response = response.lower()
-        response = ''.join(e for e in response if e.isalnum())
-        return response == response[::-1]
+        fmt_response = self.strip_boilerplate(response)
+        fmt_response = fmt_response.lower()
+        fmt_response = ''.join(e for e in fmt_response if e.isalnum())
+        return fmt_response == fmt_response[::-1]

@@ -27,7 +27,8 @@ class IsogramConstraint(Constraint):
         Returns:
             bool: True if all words are isograms, False otherwise.
         """
-        words = response.split()
+        fmt_response = self.strip_boilerplate(response)
+        words = fmt_response.split()
         for word in words:
 
             # remove punctuation

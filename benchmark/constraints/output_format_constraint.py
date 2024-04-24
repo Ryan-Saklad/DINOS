@@ -47,55 +47,56 @@ class OutputFormatConstraint(Constraint):
         Returns:
             bool: True if the response matches the expected output format, False otherwise.
         """
+        fmt_response = self.strip_boilerplate(response)
         match self.output_type:
             case OutputType.JSON:
                 try:
-                    result = json.loads(response)['Response']
+                    result = json.loads(fmt_response)['Response']
                     self.response = result
                 except (json.decoder.JSONDecodeError, KeyError):
                     self.violations.append("The response is not in the requested format.")
                     return False
             case OutputType.YAML:
                 try:
-                    result = yaml.safe_load(response)['Response']
+                    result = yaml.safe_load(fmt_response)['Response']
                     self.response = result
                 except (yaml.YAMLError, KeyError):
                     self.violations.append("The response is not in the requested format.")
                     return False
             case OutputType.XML:
                 try:
-                    result = ET.fromstring(response)
+                    result = ET.fromstring(fmt_response)
                     if result.tag.lower() != 'response' or not isinstance(result.text, str):
                         raise ValueError
                     self.response = result.text.strip()
                 except (ET.ParseError, ValueError, IndexError):
                     self.violations.append("The response is not in the requested format.")
                     return False
-            case OutputType.WRAP:
-                lines = response.split("\n")
-                num_lines = self.wrap_lines
-
-                # if the response isn't long enough, only check the beginning and end
-                if len(lines) < 2 * self.wrap_lines:
-                    num_lines = 1
-                wrap_start = lines[:num_lines]
-                wrap_end = lines[-num_lines:]
-
-                start_valid = False
-                end_valid = False
-                for line in wrap_start:
-                    start_valid |= line.startswith(self.wrap_text)
-                for line in wrap_end:
-                    end_valid |= line.endswith(self.wrap_text)
-
-                # the response is only valid if it starts and ends with the correct text
-                if not (start_valid & end_valid):
-                    self.violations.append("The response is not in the requested format.")
-                    return False
-                else:
-                    parsed_start = [line.removeprefix(self.wrap_text) for line in wrap_start]
-                    parsed_end = [line.removesuffix(self.wrap_text) for line in wrap_end]
-                    self.response = '\n'.join(parsed_start + lines[num_lines:-num_lines] + parsed_end)
+            # case OutputType.WRAP:
+            #     lines = response.split("\n")
+            #     num_lines = self.wrap_lines
+            #
+            #     # if the response isn't long enough, only check the beginning and end
+            #     if len(lines) < 2 * self.wrap_lines:
+            #         num_lines = 1
+            #     wrap_start = lines[:num_lines]
+            #     wrap_end = lines[-num_lines:]
+            #
+            #     start_valid = False
+            #     end_valid = False
+            #     for line in wrap_start:
+            #         start_valid |= line.startswith(self.wrap_text)
+            #     for line in wrap_end:
+            #         end_valid |= line.endswith(self.wrap_text)
+            #
+            #     # the response is only valid if it starts and ends with the correct text
+            #     if not (start_valid & end_valid):
+            #         self.violations.append("The response is not in the requested format.")
+            #         return False
+            #     else:
+            #         parsed_start = [line.removeprefix(self.wrap_text) for line in wrap_start]
+            #         parsed_end = [line.removesuffix(self.wrap_text) for line in wrap_end]
+            #         self.response = '\n'.join(parsed_start + lines[num_lines:-num_lines] + parsed_end)
 
         return True
 
@@ -113,7 +114,7 @@ class OutputFormatConstraint(Constraint):
                 description += " There should be a 'Response' key with corresponding value equal to the response."
             case OutputType.XML:
                 description += " The root tag should be named 'Response' and should directly enclose the response."
-            case OutputType.WRAP:
-                description = f"The response must be enclosed in '{self.wrap_text}' characters. That is, the response should start and end with '{self.wrap_text}'."
+            # case OutputType.WRAP:
+            #     description = f"The response must be enclosed in '{self.wrap_text}' characters. That is, the response should start and end with '{self.wrap_text}'."
 
         return description

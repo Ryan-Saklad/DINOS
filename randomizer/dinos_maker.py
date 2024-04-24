@@ -137,10 +137,10 @@ def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, cons
                 current_constraint = IsogramConstraint()
             elif i == OutputFormatConstraint:
                 wrap_text = ""
-                output_type = random.choice([OutputType.JSON, OutputType.YAML, OutputType.XML, OutputType.WRAP])
+                output_type = random.choice([OutputType.JSON, OutputType.YAML, OutputType.XML])#, OutputType.WRAP])
                 wrap_lines = random.randint(1, 5)
-                if output_type == OutputType.WRAP:
-                    wrap_text = random.choice(["###", "$$$", "!!!", "&&&"])
+                # if output_type == OutputType.WRAP:
+                #     wrap_text = random.choice(["###", "$$$", "!!!", "&&&"])
                 current_constraint = OutputFormatConstraint(output_type, wrap_text, wrap_lines)
             elif i == PalindromeConstraint:
                 current_constraint = PalindromeConstraint()

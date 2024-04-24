@@ -39,7 +39,8 @@ class FibonacciSequenceConstraint(Constraint):
         Returns:
             bool: True if the number of elements is a Fibonacci number, False otherwise.
         """
-        element_count: int = count_elements(response, self.element_type)
+        fmt_response = self.strip_boilerplate(response)
+        element_count: int = count_elements(fmt_response, self.element_type)
 
         if element_count == 0:
             self.violations.append(f"The response contains no {self.element_type.name.lower()}, which does not satisfy the Fibonacci sequence constraint.")

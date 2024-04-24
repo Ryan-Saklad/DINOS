@@ -18,5 +18,6 @@ class WriteBackwardsConstraint(Constraint):
         Returns:
             bool: True if the response is the original text written backwards, False otherwise.
         """
+        fmt_response = self.strip_boilerplate(response)
         expected_response = original_text[::-1]
-        return response == expected_response
+        return fmt_response == expected_response

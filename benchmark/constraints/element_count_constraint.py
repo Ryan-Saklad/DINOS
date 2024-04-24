@@ -60,10 +60,11 @@ class ElementCountConstraint(Constraint):
         Returns:
             bool: True if the number of elements or occurrences meets the constraints, False otherwise.
         """
+        fmt_response = self.strip_boilerplate(response)
         if self.element:
-            element_count: int = count_elements(response, self.element_type, self.element, self.case_sensitive)
+            element_count: int = count_elements(fmt_response, self.element_type, self.element, self.case_sensitive)
         else:
-            element_count: int = count_elements(response, self.element_type, case_sensitive=self.case_sensitive)
+            element_count: int = count_elements(fmt_response, self.element_type, case_sensitive=self.case_sensitive)
 
         if self.exact_count and element_count != self.exact_count:
             if self.element:

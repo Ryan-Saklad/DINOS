@@ -21,7 +21,8 @@ class DoubleLetterConstraint(Constraint):
         Returns:
             bool: True if no words with double letters are found, False otherwise.
         """
-        words = response.split()
+        fmt_response = self.strip_boilerplate(response)
+        words = fmt_response.split()
         for word in words:
 
             # remove punctuation
