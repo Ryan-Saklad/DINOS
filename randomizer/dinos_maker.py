@@ -185,7 +185,7 @@ def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, cons
             if current_constraint : 
                 single_run_prompts.append(current_constraint)
         if topic and single_run_prompts : 
-            topic_class = TopicPicker('misc/topics.txt', seed + num_runs)
+            topic_class = TopicPicker('../misc/topics.txt', seed + num_runs)
             topic_data = topic_class.create_topic_data_structure()
             topic = topic_class.select_new_topic(topic_data)
             q = question.Question(constraints= single_run_prompts, topic = topic)
