@@ -1,5 +1,5 @@
 from benchmark import question
-from benchmark.constraints.write_backwards_constraint import WriteBackwardsConstraint
+from benchmark.problems import problem
 import pickle
 import argparse
 import pandas as pd
@@ -26,8 +26,10 @@ def evaluate_prompts(args) :
     for prompt in range(len(prompt_objects)) :
         if isinstance(prompt_objects[prompt], question.Question) :
             results.append(prompt_objects[prompt].evaluate_response(model_responses[prompt]))
-        else :
+        elif isinstance(prompt_objects[prompt], problem.Problem) :
             results.append((prompt_objects[prompt].validate(model_responses[prompt]),None,None,None))
+        else :
+            results.append((prompt_objects[prompt].validate(model_responses[prompt], original_constraints[prompt]),None,None,None))
     df = pd.DataFrame(results, columns = ['Correctness', 'Violated Constraints', 'Partial Correctness', 'Satisfied Constraints'])
     df.to_csv(args.output, index = False)
     print("Evaluation results saved to", args.output)

@@ -42,6 +42,7 @@ def run_prompt_generator(args) :
         constraint_type = config.get('constraint_type')
         if constraint_type == 'None' : 
             constraint_type = []
+        # TODO this output path doesn't get used
         output = config.get('output', 'random_prompts.csv')
         prompts, objects = dinos_maker.make_prompts(seed, num_prompts, topic, num_per_prompt, constraint_type, llm)
     # Save the prompts to a csv file
