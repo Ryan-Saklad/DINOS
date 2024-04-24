@@ -14,6 +14,7 @@ venv/
 # Generated files
 random_prompts.csv
 random_prompts.pkl
+*.json
 
 # PyCharm
 .idea/
