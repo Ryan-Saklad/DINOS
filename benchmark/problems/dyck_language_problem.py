@@ -33,4 +33,4 @@ class DyckLanguageProblem(Problem):
         self.problem = self.problem[:split_index]
 
     def validate(self, response: str) -> bool:
-        return self.answer == response
+        return self.answer == self.strip_boilerplate(response)

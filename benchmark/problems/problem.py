@@ -1,10 +1,12 @@
 import random
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from benchmark.benchmark_task import BenchmarkTask
 from utils.problem_type import ProblemType
 
-class Problem(ABC):
+class Problem(BenchmarkTask):
     def __init__(self, seed: int | None = None) -> None:
+        super().__init__()
         self.problem: str = ""
         self.answer: str = ""
         self.rng: random.Random = random.Random(seed if seed is not None else random.randint(0, 1000000))

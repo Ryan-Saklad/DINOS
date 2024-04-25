@@ -3,23 +3,23 @@ import pytest
 from benchmark.problems.boolean_expression_problem import BooleanExpressionProblem
 
 @pytest.mark.parametrize("expression, expected_result", [
-    ("not ( True ) and ( True )", "False"),
-    ("True and not not ( not False )", "True"),
-    ("not True or False or ( False )", "False"),
-    ("False or not ( True ) and False", "False"),
-    ("True or not False and True and False", "True"),
-    ("False or not not not False and True", "True"),
-    ("not True and ( False or True )", "False"),
-    ("True and not False or ( True )", "True"),
-    ("not True or ( False and True )", "False"),
-    ("not True or ( True or False )", "True"),
-    ("False or ( False ) and not False", "False"),
-    ("not False or True and False and False", "True"),
-    ("not True or False or not not True", "True"),
-    ("True and True and False and not True", "False"),
-    ("not not True and not True or True", "True"),
-    ("not not not ( True and False )", "True"),
-    ("not not False and not not not False", "False")
+    ("not ( True ) and ( True )", "Sure, here you go!\nFalse"),
+    ("True and not not ( not False )", "Sure, here you go!\nTrue"),
+    ("not True or False or ( False )", "Sure, here you go!\nFalse"),
+    ("False or not ( True ) and False", "Sure, here you go!\nFalse"),
+    ("True or not False and True and False", "Sure, here you go!\nTrue"),
+    ("False or not not not False and True", "Sure, here you go!\nTrue"),
+    ("not True and ( False or True )", "Sure, here you go!\nFalse"),
+    ("True and not False or ( True )", "Sure, here you go!\nTrue"),
+    ("not True or ( False and True )", "Sure, here you go!\nFalse"),
+    ("not True or ( True or False )", "Sure, here you go!\nTrue"),
+    ("False or ( False ) and not False", "Sure, here you go!\nFalse"),
+    ("not False or True and False and False", "Sure, here you go!\nTrue"),
+    ("not True or False or not not True", "Sure, here you go!\nTrue"),
+    ("True and True and False and not True", "Sure, here you go!\nFalse"),
+    ("not not True and not True or True", "Sure, here you go!\nTrue"),
+    ("not not not ( True and False )", "Sure, here you go!\nTrue"),
+    ("not not False and not not not False", "Sure, here you go!\nFalse")
 ])
 def test_boolean_expression_problem(expression, expected_result):
     problem = BooleanExpressionProblem()
@@ -28,26 +28,26 @@ def test_boolean_expression_problem(expression, expected_result):
     assert problem.validate(expected_result) == True
 
 @pytest.mark.parametrize("expression, expected_result", [
-    ("not ( True ) and ( True )", "True"),
-    ("True and not not ( not False )", "False"),
-    ("not True or False or ( False )", "True"),
-    ("False or not ( True ) and False", "True"),
-    ("True or not False and True and False", "False"),
-    ("False or not not not False and True", "False"),
-    ("not True and ( False or True )", "True"),
-    ("True and not False or ( True )", "False"),
-    ("not True or ( False and True )", "True"),
-    ("not True or ( True or False )", "False"),
-    ("False or ( False ) and not False", "True"),
-    ("not False or True and False and False", "False"),
-    ("not True or False or not not True", "False"),
-    ("True and True and False and not True", "True"),
-    ("not not True and not True or True", "False"),
-    ("not not not ( True and False )", "False"),
-    ("not not False and not not not False", "True"),
-    ("not not False and not not not False", ""),
-    ("not not False and not not not False", "true"),
-    ("not not False and not not not False", "false")
+    ("not ( True ) and ( True )", "Sure, here you go!\nTrue"),
+    ("True and not not ( not False )", "Sure, here you go!\nFalse"),
+    ("not True or False or ( False )", "Sure, here you go!\nTrue"),
+    ("False or not ( True ) and False", "Sure, here you go!\nTrue"),
+    ("True or not False and True and False", "Sure, here you go!\nFalse"),
+    ("False or not not not False and True", "Sure, here you go!\nFalse"),
+    ("not True and ( False or True )", "Sure, here you go!\nTrue"),
+    ("True and not False or ( True )", "Sure, here you go!\nFalse"),
+    ("not True or ( False and True )", "Sure, here you go!\nTrue"),
+    ("not True or ( True or False )", "Sure, here you go!\nFalse"),
+    ("False or ( False ) and not False", "Sure, here you go!\nTrue"),
+    ("not False or True and False and False", "Sure, here you go!\nFalse"),
+    ("not True or False or not not True", "Sure, here you go!\nFalse"),
+    ("True and True and False and not True", "Sure, here you go!\nTrue"),
+    ("not not True and not True or True", "Sure, here you go!\nFalse"),
+    ("not not not ( True and False )", "Sure, here you go!\nFalse"),
+    ("not not False and not not not False", "Sure, here you go!\nTrue"),
+    ("not not False and not not not False", "Sure, here you go!\n"),
+    ("not not False and not not not False", "Sure, here you go!\ntrue"),
+    ("not not False and not not not False", "Sure, here you go!\nfalse")
 ])
 def test_boolean_expression_problem(expression, expected_result):
     problem = BooleanExpressionProblem()

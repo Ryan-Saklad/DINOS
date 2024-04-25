@@ -4,14 +4,14 @@ from benchmark.constraints.isogram_constraint import IsogramConstraint
 
 
 @pytest.mark.parametrize('text, expected, non_isograms', [
-    ('She wasn\'t sure if she wanted to go or not.', True, []),
-    ('They want Alaskan salmon for lunch.', False, ['Alaskan']),
-    ('You guys like meat.', True, []),
-    ('I\'ve been a big fan of yours for a long time.', False, ['been']),
-    ('We can\’t get there on time.', False, ['there']),
-    ('I want to meet his sister-in-law.', False, ['meet', 'sister-in-law']),
-    ('Don\’t be silly, you\'re going to the game!', False, ['silly', 'going']),
-    ('Can I open the door?', False, ['door'])
+    ('Sure, here you go!\nShe wasn\'t sure if she wanted to go or not.', True, []),
+    ('Sure, here you go!\nThey want Alaskan salmon for lunch.', False, ['Alaskan']),
+    ('Sure, here you go!\nYou guys like meat.', True, []),
+    ('Sure, here you go!\nI\'ve been a big fan of yours for a long time.', False, ['been']),
+    ('Sure, here you go!\nWe can\’t get there on time.', False, ['there']),
+    ('Sure, here you go!\nI want to meet his sister-in-law.', False, ['meet', 'sister-in-law']),
+    ('Sure, here you go!\nDon\’t be silly, you\'re going to the game!', False, ['silly', 'going']),
+    ('Sure, here you go!\nCan I open the door?', False, ['door'])
 ])
 def test_isogram(text, expected, non_isograms):
     constraint = IsogramConstraint()

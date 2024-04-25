@@ -1,8 +1,12 @@
-import os, json, pprint, datetime, csv, subprocess, time
-import requests
-
+import os
+import json
+import pprint
+import datetime
+import csv
+import subprocess
+import time
 import pandas as pd
-
+from misc.utils.openrouter_utils import generate_response
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,33 +23,6 @@ def read_jsonl(path: str) -> list:
         jsonl = f.read().splitlines()
         jlines = [json.loads(jline) for jline in jsonl]
         return jlines
-
-
-def get_llm_response(messages: list, model: str) -> str | None:
-    """Generate a response using the OpenRouter service"""
-    OPENROUTER_API_KEY = os.environ['OPENROUTER_API_KEY']
-
-    try:
-        response = requests.post(
-            url="https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-            },
-            data = json.dumps({
-                "model": model,
-                "messages": messages
-            })
-        )
-        result = response.json()
-    except Exception as e:
-        print(repr(e))
-        return None
-
-    if 'error' in response:
-        print(response)
-        return None
-
-    return result
 
 
 def get_input_data(file: str = PROMPTS_PATH) -> list:
@@ -67,7 +44,7 @@ def generate_responses(model: str, input_data: list) -> tuple[list, set]:
         response = None
         prompt_count = 0
         while response is None and prompt_count < 3:
-            response = get_llm_response(messages=messages, model=model)
+            response = generate_response(messages=messages, model=model, api_key=os.environ['OPENROUTER_API_KEY'])
             if response is None:
                 time.sleep(1)  # the primary source of errors is rate limiting
             prompt_count += 1

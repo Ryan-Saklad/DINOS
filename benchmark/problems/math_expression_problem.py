@@ -30,4 +30,4 @@ class MathExpressionProblem(Problem):
         self.answer = str(eval(self.problem))
 
     def validate(self, response: str) -> bool:
-        return self.answer == response
+        return self.answer == self.strip_boilerplate(response)

@@ -9,7 +9,7 @@ class DoubleLetterConstraint(Constraint):
                          'That is, for a given word in the response, no consecutive '
                          'letters should be the same.')
 
-    def validate(self, response: str) -> bool:
+    def validate(self, response: str, original_text: str = '') -> bool:
         """
         Validates the models response and saves words that contain double letters,
         if any. A double letter word is not the same as an isogram. In a double letter
@@ -21,7 +21,8 @@ class DoubleLetterConstraint(Constraint):
         Returns:
             bool: True if no words with double letters are found, False otherwise.
         """
-        words = response.split()
+        fmt_response = self.strip_boilerplate(response)
+        words = fmt_response.split()
         for word in words:
 
             # remove punctuation

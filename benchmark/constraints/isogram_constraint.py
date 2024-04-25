@@ -16,7 +16,7 @@ class IsogramConstraint(Constraint):
     def __init__(self) -> None:
         super().__init__("Each word in the response must be an isogram.")
 
-    def validate(self, response: str) -> bool:
+    def validate(self, response: str, original_text: str = '') -> bool:
         """
         Validates if the given response uses only isograms. Saves all non-isogram
         words to better measure performance.
@@ -27,7 +27,8 @@ class IsogramConstraint(Constraint):
         Returns:
             bool: True if all words are isograms, False otherwise.
         """
-        words = response.split()
+        fmt_response = self.strip_boilerplate(response)
+        words = fmt_response.split()
         for word in words:
 
             # remove punctuation

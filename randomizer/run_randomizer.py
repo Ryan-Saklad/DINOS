@@ -42,16 +42,16 @@ def run_prompt_generator(args) :
         constraint_type = config.get('constraint_type')
         if constraint_type == 'None' : 
             constraint_type = []
-        output = config.get('output', 'random_prompts.csv')
         prompts, objects = dinos_maker.make_prompts(seed, num_prompts, topic, num_per_prompt, constraint_type, llm)
-    # Save the prompts to a csv file
+    # Save the prompts to a json file
     df = pd.DataFrame(prompts, columns = ['Prompt', "Constraint Type"])
-    df.to_json(args.output, default_handler=str)
+    output = config.get('output', 'random_prompts.json') if args.config is not None else args.output
+    df.to_json(output, default_handler=str)
     print("Prompts saved to", args.output)
     import pickle
-    with open(args.output.replace('.json', '.pkl'), 'wb') as f:
+    with open(output.replace('.json', '.pkl'), 'wb') as f:
         pickle.dump(objects, f)
-    print("Objects saved to", args.output.replace('.json', '.pkl'))
+    print("Objects saved to", output.replace('.json', '.pkl'))
 
 if __name__ == '__main__':
     run_prompt_generator(args)

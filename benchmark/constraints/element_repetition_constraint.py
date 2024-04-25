@@ -47,7 +47,7 @@ class ElementRepetitionConstraint(Constraint):
         description += " (case-sensitive)" if case_sensitive else " (case-insensitive)"
         super().__init__(description)
 
-    def validate(self, response: str) -> bool:
+    def validate(self, response: str, original_text: str = '') -> bool:
         """
         Validates if the response satisfies the element repetition constraint.
         
@@ -57,7 +57,8 @@ class ElementRepetitionConstraint(Constraint):
         Returns:
             bool: True if the response satisfies the element repetition constraint, False otherwise.
         """
-        scopes: list[str] = split_elements(response, self.scope_type)
+        fmt_response = self.strip_boilerplate(response)
+        scopes: list[str] = split_elements(fmt_response, self.scope_type)
 
         for scope in scopes:
             if self.element_type == ElementType.WORDS:

@@ -14,7 +14,14 @@ venv/
 # Generated files
 random_prompts.csv
 random_prompts.pkl
+model_responses*.csv
+evaluation_results*.csv
+evaluations/
+*.zip
 *.json
 
 # PyCharm
 .idea/
+
+# MacOS
+.DS_Store

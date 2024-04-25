@@ -62,4 +62,5 @@ class NavigateProblem(Problem):
         self.answer = f"({x}, {y})"
 
     def validate(self, response: str) -> bool:
-        return response.lower() == self.answer.lower()
+        fmt_response = self.strip_boilerplate(response)
+        return fmt_response.lower() == self.answer.lower()

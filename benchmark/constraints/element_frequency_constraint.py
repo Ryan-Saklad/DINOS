@@ -42,7 +42,7 @@ class ElementFrequencyConstraint(Constraint):
         description = " ".join(description_parts)
         super().__init__(description)
 
-    def validate(self, response: str) -> bool:
+    def validate(self, response: str, original_text: str = '') -> bool:
         """
         Validates if the element frequency in the response meets the specified constraints.
         
@@ -52,14 +52,15 @@ class ElementFrequencyConstraint(Constraint):
         Returns:
             bool: True if the element frequency meets the constraints, False otherwise.
         """
+        fmt_response = self.strip_boilerplate(response)
         if not self.case_sensitive:
-            response = response.lower()
+            fmt_response = fmt_response.lower()
             element = self.element.lower()
         else:
             element = self.element
 
-        element_count: int = count_elements(response, self.element_type, element)
-        total_elements: int = count_elements(response, self.element_type)
+        element_count: int = count_elements(fmt_response, self.element_type, element)
+        total_elements: int = count_elements(fmt_response, self.element_type)
         frequency: float = (element_count / total_elements) if total_elements > 0 else 0.0
 
         if self.min_frequency and frequency < self.min_frequency:
