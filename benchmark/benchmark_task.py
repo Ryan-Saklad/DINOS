@@ -15,4 +15,5 @@ class BenchmarkTask(ABC):
         lines = fmt_response.split('\n')
         if len(lines) < 2:
             return ''
-        return '\n'.join(lines[1:])
+        fmt_response = '\n'.join(lines[1:])
+        return fmt_response.lstrip()  # don't keep any leading whitespace
