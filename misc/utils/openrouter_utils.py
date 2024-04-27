@@ -5,7 +5,10 @@ import time
 import os
 
 
-def generate_response(messages: list, model: str, api_key: str) -> dict[str, dict] | None:
+def generate_response(messages: list,
+                      model: str,
+                      api_key: str,
+                      temperature: float = 1.0) -> dict[str, dict] | None:
     """Generate a response using the OpenRouter service"""
 
     try:
@@ -16,7 +19,8 @@ def generate_response(messages: list, model: str, api_key: str) -> dict[str, dic
             },
             data = json.dumps({
                 "model": model,
-                "messages": messages
+                "messages": messages,
+                "temperature": temperature
             })
         )
         result = response.json()
@@ -31,14 +35,35 @@ def generate_response(messages: list, model: str, api_key: str) -> dict[str, dic
     return result
 
 
-def generate_batch_responses(batch_prompts: list, model: str, api_key: str, prompt_limit: int = 3) -> list[list[str]] | None:
+def generate_batch_responses(batch_prompts: list,
+                             model: str,
+                             api_key: str,
+                             prompt_limit: int = 3,
+                             temperature: float = 0.0) -> list[list[str]] | None:
     responses = []
     for prompt in batch_prompts:
-        messages = [{'role': 'user', 'content': prompt}]
+        messages = [
+            {'role': 'system', 'content': 'You are a problem solver and you need to respond to a '
+                                          'prompt while satisfying one or more constraints. Respond with only '
+                                          'your answer without including extra verbiage. Don\'t explain '
+                                          'how you arrived at your answer.'},
+            {'role': 'system', 'content': 'Here\'s an example of a bad response:'},
+            {'role': 'user', 'content': 'Tell me about sports teams from Boston, Massachusetts. Use the word '
+                                        '"win" at least two times.'},
+            {'role': 'assistant', 'content': 'Sure, here you go!\n\nBoston sports teams like to win.\n\nLet '
+                                             'me know if I can help with anything else.'},
+            {'role': 'system', 'content': 'Here\'s an example of a good response to the same prompt:'},
+            {'role': 'assistant', 'content': 'The New England Patriots always win, and the Boston Celtics '
+                                             'win all the time too!'},
+            {'role': 'user', 'content': prompt}
+        ]
         response = None
         prompt_count = 0
         while response is None and prompt_count < prompt_limit:
-            response = generate_response(messages=messages, model=model, api_key=api_key)
+            response = generate_response(messages=messages,
+                                         model=model,
+                                         api_key=api_key,
+                                         temperature=temperature)
             if response is None:
                 print(f'Unable to generate response. Attempt {prompt_count+1}')
                 time.sleep(0.5)
