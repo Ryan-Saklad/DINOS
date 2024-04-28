@@ -60,7 +60,7 @@ class OutputFormatConstraint(Constraint):
                 try:
                     result = yaml.safe_load(fmt_response)['Response']
                     self.response = result
-                except (yaml.YAMLError, KeyError):
+                except (yaml.YAMLError, KeyError, TypeError):
                     self.violations.append("The response is not in the requested format.")
                     return False
             case OutputType.XML:
