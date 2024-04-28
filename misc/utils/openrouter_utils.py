@@ -72,9 +72,13 @@ def generate_batch_responses(batch_prompts: list,
         if response is None:
             return None
 
-        response = response['choices'][0]['message']['content']
-        print(response)
-        responses.append([response])
+        try:
+            response = response['choices'][0]['message']['content']
+            print(response)
+            responses.append([response])
+        except KeyError as e:
+            print(e)
+            return None
 
     return responses
 
@@ -92,7 +96,7 @@ def read_dinos_csv(file_path: str) -> list[str]:
     return contents[1:]
 
 
-def write_dinos_csv(file_path: str, contents: list[list[str]]) -> None:
+def write_dinos_csv(file_path: str, contents: list[list[str | int]]) -> None:
     with open(file_path, 'a+', newline='') as csvfile:
         csv_writer = csv.writer(csvfile, delimiter=',')
         for row in contents:
@@ -110,3 +114,9 @@ def get_model_name(openrouter_model_name: str) -> str:
     model_name = openrouter_model_name.split('/')[-1]
     model_name = model_name.split(':')[0]
     return model_name
+
+
+def calculate_num_steps(num_prompts: int, batch_size: int) -> int:
+    steps = num_prompts // batch_size
+    steps += 1 if num_prompts % batch_size > 0 else 0
+    return steps
