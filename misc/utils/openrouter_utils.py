@@ -75,7 +75,7 @@ def generate_batch_responses(batch_prompts: list,
         try:
             response = response['choices'][0]['message']['content']
             print(response)
-            responses.append([response])
+            responses.append([response.strip()])
         except KeyError as e:
             print(e)
             return None
