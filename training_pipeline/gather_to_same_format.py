@@ -21,13 +21,9 @@ def gather_to_same_format(prompts, responses, evaluation = None) :
         prompts_answers_validate = {"Prompt" : {}, "Response" : {}}
         eval_data_list = list(eval_data["Partial Correctness"])
         for i in range(len(eval_data_list)):
-            try :
-                if "Partial Correctness Score = 1.0" in eval_data_list[i]:
-                    print("Prompt", i, "is valid")
-                    prompts_answers_validate["Prompt"][i] = prompts_json["Prompt"][i]
-                    prompts_answers_validate["Response"][i] = responses_json["Response"][i]
-            except :
-                continue
+            if ("Partial Correctness Score = 1.0" in str(eval_data_list[i])):
+                prompts_answers_validate["Prompt"][i] = prompts_json["Prompt"][str(i)]
+                prompts_answers_validate["Response"][i] = responses_json["Response"][str(i)]
         #Write the gathered data to a file
         prompts = prompts.replace('.json', "_same_format_positive.json")
         with open(prompts, 'w') as f:
