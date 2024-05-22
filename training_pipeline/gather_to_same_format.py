@@ -23,6 +23,7 @@ def gather_to_same_format(prompts, responses, evaluation = None) :
         for i in range(len(eval_data_list)):
             try :
                 if "Partial Correctness Score = 1.0" in eval_data_list[i]:
+                    print("Prompt", i, "is valid")
                     prompts_answers_validate["Prompt"][i] = prompts_json["Prompt"][i]
                     prompts_answers_validate["Response"][i] = responses_json["Response"][i]
             except :
