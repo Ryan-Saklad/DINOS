@@ -39,7 +39,7 @@ def generate_batch_responses(batch_prompts: list,
                              model: str,
                              api_key: str,
                              prompt_limit: int = 3,
-                             temperature: float = 0.0) -> list[list[str]] | None:
+                             temperature: float = 0.0) -> list[str] | None:
     responses = []
     for prompt in batch_prompts:
         messages = [
@@ -75,7 +75,7 @@ def generate_batch_responses(batch_prompts: list,
         try:
             response = response['choices'][0]['message']['content']
             print(response)
-            responses.append([response.strip()])
+            responses.append(response.strip())
         except KeyError as e:
             print(e)
             return None
@@ -107,6 +107,12 @@ def read_dinos_json(file_path: str) -> dict[dict, dict]:
     with open(file_path) as jsonfile:
         contents = json.load(jsonfile)
         return contents
+
+
+def write_dinos_json(file_path: str, contents: dict[str, list[str]]) -> None:
+    print(f'Writing {len(contents)} responses to {file_path}')
+    with open(file_path, 'w', encoding='utf-8') as f:
+        json.dump(contents, f)
 
 
 def get_model_name(openrouter_model_name: str) -> str:
