@@ -1,15 +1,20 @@
-from benchmark.problems.problem import Problem
-from utils.problem_type import ProblemType
+from benchmark.problems.problem import BaseProblem, ResponseProblem, MultipleChoiceProblem
 
-class BooleanExpressionProblem(Problem):
-    problem_type = ProblemType.PROBLEM
-    def __init__(self) -> None:
-        super().__init__()
-        self.prompt: str = "Please evaluate the following boolean expression with 'True' or 'False' as the answer:"
-        self.problem: str = ""
-        self.answer: str = ""
 
-    def generate(self, min_depth: int = 3, max_depth: int = 5) -> None:
+class BooleanExpressionProblem(BaseProblem):
+    def __init__(self, seed: int | None = None) -> None:
+        super().__init__(seed)
+
+        self.bool_values: list[str] = ["True", "False"]
+        self.operators: list[str] = ["and", "or"]
+        self.unary_operator: str = "not"
+
+    def generate(self, min_depth: int = 3, max_depth: int = 4) -> None:
+        if min_depth < 1 or max_depth < min_depth:
+            raise ValueError("min_depth must be >= 1 and max_depth must be >= min_depth")
+
+        self.depth = self.rng.randint(min_depth, max_depth)
+
         def generate_expression(depth: int) -> str:
             if depth == 1:
                 return self.rng.choice(self.bool_values)
@@ -24,26 +29,94 @@ class BooleanExpressionProblem(Problem):
                     operator = self.rng.choice(self.operators)
                     return f"({sub_expr1}) {operator} ({sub_expr2})"
 
-        self.bool_values: list[str] = ["True", "False"]
-        self.operators: list[str] = ["and", "or"]
-        self.unary_operator: str = "not"
+        self.problem: str = generate_expression(self.depth).replace("(True)", "True").replace("(False)", "False").replace("(not True)", "not True").replace("(not False)", "not False")
+        self.answer: str = self._evaluate(self.problem)
+        self.correct_answer: str = self.answer
 
-        depth: int = self.rng.randint(min_depth, max_depth)
-
-        self.problem = generate_expression(depth)
-        self.problem = self.problem.replace("(True)", "True").replace("(False)", "False")
-        self.problem = self.problem.replace("(not True)", "not True").replace("(not False)", "not False")
-
-        self.answer = self.evaluate(self.problem)
-
-    def evaluate(self, expression: str) -> str:
+    def _evaluate(self, expression: str) -> str:
         return str(eval(expression))
 
-    def validate(self, response: str) -> bool:
-        return self.answer == self.strip_boilerplate(response)
+class BooleanExpressionResponseProblem(BooleanExpressionProblem, ResponseProblem):
+    def __init__(self, seed: int | None = None) -> None:
+        super().__init__(seed)
 
-    def get_description(self, include_problem: bool = True) -> str:
-        if include_problem:
-            return f"{self.prompt}\n{self.problem}"
+        self.problem_prompt: str = "Evaluate the provided boolean expression. Respond only with 'True' or 'False'."
+    
+    def generate_prompt(self, num_shots: int = 0) -> None:
+        self.prompt = f"{self.problem_prompt}\n\n{self.problem}"
+
+        examples = []
+        for i in range(num_shots):
+            example_problem = BooleanExpressionResponseProblem(seed=seed+i)
+            example_problem.generate(min_depth=self.depth, max_depth=self.depth)
+            example_problem.generate_prompt(num_shots=0)
+            examples.append(f"{example_problem.prompt}\n{example_problem.answer}")
+        
+        examples_str = "\n\n".join(examples)
+        
+        if len(examples) > 0:
+            self.prompt = f"{examples_str}\n\n{self.prompt}"
+
+
+class BooleanExpressionMultipleChoiceProblem(BooleanExpressionProblem, MultipleChoiceProblem):
+    def __init__(self, seed: int | None = None) -> None:
+        super().__init__(seed)
+
+        self.multiple_choice_prompt_t: str = "Select the option that evaluates to True. Respond only with the label corresponding to your choice."
+        self.multiple_choice_prompt_f: str = "Select the option that evaluates to False. Respond only with the label corresponding to your choice."
+
+    def generate_prompt(
+        self, 
+        num_shots: int = 0, 
+        num_options: int = 2,
+        use_uppercase: bool = True, 
+        use_lowercase: bool = False, 
+        use_numbers: bool = False, 
+        prevent_same_letter_case: bool = False, 
+        randomize: bool = False
+    ) -> None:
+        option_labels = self._generate_option_labels(
+            num_options, 
+            use_uppercase, 
+            use_lowercase, 
+            use_numbers, 
+            prevent_same_letter_case, 
+            randomize
+        )
+        
+        values = [self.problem]
+        seed_increment: int = 1
+
+        while len(values) < num_options:
+            new_problem = BooleanExpressionResponseProblem(seed=self.seed+seed_increment)
+            new_problem.generate(min_depth=self.depth, max_depth=self.depth)
+            seed_increment += 1
+
+            if new_problem.answer != self.correct_answer and new_problem.problem not in values:
+                values.append(new_problem.problem)
+
+        self.rng.shuffle(values)
+        self.options = dict(zip(option_labels, values))
+        self.option_labels = option_labels
+
+        options_str = "\n".join([f"{label}. {option}" for label, option in zip(option_labels, values)])
+
+        correct_label = next(label for label, option in self.options.items() if option == self.problem)
+        self.answer = correct_label
+
+        if self.correct_answer == "True":
+            self.prompt = f"{self.multiple_choice_prompt_t}\n\nOptions:\n{options_str}"
         else:
-            return self.prompt
+            self.prompt = f"{self.multiple_choice_prompt_f}\n\nOptions:\n{options_str}"
+
+        examples = []
+        for i in range(num_shots):
+            example_problem = BooleanExpressionMultipleChoiceProblem(seed=self.seed + seed_increment + i)
+            example_problem.generate(min_depth=self.depth, max_depth=self.depth)
+            example_problem.generate_prompt(num_shots=0, num_options=num_options, use_uppercase=use_uppercase, use_lowercase=use_lowercase, use_numbers=use_numbers, prevent_same_letter_case=prevent_same_letter_case, randomize=randomize)
+            examples.append(f"{example_problem.prompt}\n{example_problem.answer}")
+        
+        examples_str = "\n\n".join(examples)
+        
+        if len(examples) > 0:
+            self.prompt = f"{examples_str}\n\n{self.prompt}"
