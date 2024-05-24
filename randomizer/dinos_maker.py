@@ -77,11 +77,11 @@ def make_prompts(seed, num_prompts = 1, topic = False, num_per_prompt = -1, cons
                     min_frequency = round(random.uniform(0, 0.25) * 100, 0)
                     max_frequency = round(min(min_frequency + random.uniform(0, 0.50), 1)* 100, 0) # max frequency is at most 100, calculated as min + random number between 0 and 1   
                 elif choice >= 0.25 : 
-                    min_frequency = None
+                    min_frequency = 1
                     max_frequency = round(random.uniform(0, 0.50) * 100, 0)
                 else : 
                     min_frequency = round(random.uniform(0, 0.25) * 100, 0)
-                    max_frequency = None
+                    max_frequency = 25
                 case_sensitive_choice = random.choice(case_sensitive)
                 current_constraint = ElementFrequencyConstraint(element_type, element, min_frequency, max_frequency, case_sensitive_choice)
             elif i == ElementLengthPatternConstraint: 
