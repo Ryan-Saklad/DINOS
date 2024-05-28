@@ -1,11 +1,11 @@
+import json
 import random
 import string
 
 from abc import ABC, abstractmethod
-from benchmark.benchmark_task import BenchmarkTask
 from utils.problem_type import ProblemType
 
-class BaseProblem(BenchmarkTask, ABC):
+class BaseProblem(ABC):
     def __init__(self, seed: int | None = None) -> None:
         super().__init__()
         self.problem_types: list[ProblemType] = [ProblemType.PROBLEM]
@@ -34,12 +34,22 @@ class BaseProblem(BenchmarkTask, ABC):
     def get_answer(self) -> str:
         return self.answer
 
+    @abstractmethod
+    def generate_problem_json(self) -> dict:
+        raise NotImplementedError
+
 
 class ResponseProblem(BaseProblem, ABC):
     def __init__(self, seed: int | None = None) -> None:
         super().__init__(seed)
 
         self.problem_types.append(ProblemType.RESPONSE)
+
+    def generate_problem_json(self) -> dict:
+        return {
+            "prompt": self.prompt,
+            "answer": self.answer
+        }
 
 
 class MultipleChoiceProblem(BaseProblem, ABC):
@@ -110,3 +120,10 @@ class MultipleChoiceProblem(BaseProblem, ABC):
         randomize: bool = False
     ) -> None:
         raise NotImplementedError
+
+    def generate_problem_json(self) -> dict:
+        return {
+            "prompt": self.prompt,
+            "options": self.options,
+            "answer": self.correct_answer # Correct answer is used for the label of the correct option rather than the actual answer
+        }

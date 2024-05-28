@@ -31,7 +31,7 @@ class MathExpressionResponseProblem(MathExpressionProblem, ResponseProblem):
     def __init__(self, seed: int | None = None) -> None:
         super().__init__(seed)
         
-        self.problem_prompt: str = "Please evaluate the following mathematical expression."
+        self.problem_prompt: str = "Please evaluate the following mathematical expression. Respond only with the numerical value."
         
     def generate_prompt(self, num_shots: int = 0) -> None:
         self.prompt = f"{self.problem_prompt}\n\n{self.problem}"
