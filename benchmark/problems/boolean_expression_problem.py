@@ -2,12 +2,22 @@ from benchmark.problems.problem import BaseProblem, ResponseProblem, MultipleCho
 
 
 class BooleanExpressionProblem(BaseProblem):
-    def __init__(self, seed: int | None = None) -> None:
+    def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
         super().__init__(seed)
+
+        if not prompts:
+            import json
+
+            with open("benchmark/prompts/en/boolean_expression_problem_prompts.json", "r") as f:
+                prompts = json.load(f)
 
         self.bool_values: list[str] = ["True", "False"]
         self.operators: list[str] = ["and", "or"]
         self.unary_operator: str = "not"
+        
+        self.problem_prompt: str = prompts["response_prompt"]
+        self.multiple_choice_prompt_t: str = prompts["multiple_choice_prompt_t"]
+        self.multiple_choice_prompt_f: str = prompts["multiple_choice_prompt_f"]
 
     def generate(self, min_depth: int = 3, max_depth: int = 4) -> None:
         if min_depth < 1 or max_depth < min_depth:
@@ -39,8 +49,6 @@ class BooleanExpressionProblem(BaseProblem):
 class BooleanExpressionResponseProblem(BooleanExpressionProblem, ResponseProblem):
     def __init__(self, seed: int | None = None) -> None:
         super().__init__(seed)
-
-        self.problem_prompt: str = "Evaluate the provided boolean expression. Respond only with 'True' or 'False'."
     
     def generate_prompt(self, num_shots: int = 0) -> None:
         self.prompt = f"{self.problem_prompt}\n\n{self.problem}"
@@ -61,10 +69,6 @@ class BooleanExpressionResponseProblem(BooleanExpressionProblem, ResponseProblem
 class BooleanExpressionMultipleChoiceProblem(BooleanExpressionProblem, MultipleChoiceProblem):
     def __init__(self, seed: int | None = None) -> None:
         super().__init__(seed)
-
-        self.multiple_choice_prompt_t: str = "Select the option that evaluates to True. Respond only with the label corresponding to your choice."
-        self.multiple_choice_prompt_f: str = "Select the option that evaluates to False. Respond only with the label corresponding to your choice."
-
     def generate_prompt(
         self, 
         num_shots: int = 0, 

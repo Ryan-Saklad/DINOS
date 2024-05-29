@@ -1,9 +1,18 @@
 from benchmark.problems.problem import BaseProblem, ResponseProblem, MultipleChoiceProblem
 
 class MathExpressionProblem(BaseProblem):
-    def __init__(self, seed: int | None = None) -> None:
+    def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
         super().__init__(seed)
+
+        if not prompts:
+            import json
+
+            with open("benchmark/prompts/en/math_expression_problem_prompts.json", "r") as f:
+                prompts = json.load(f)
         
+        self.problem_prompt: str = prompts["response_prompt"]
+        self.multiple_choice_prompt: str = prompts["multiple_choice_prompt"]
+
         self.operators: list[str] = ["+", "-", "*"]
         
     def generate(self, min_depth: int = 2, max_depth: int = 3, min_value: int = -9, max_value: int = 9, min_sub_expressions: int = 2, max_sub_expressions: int = 4) -> None:
@@ -31,8 +40,6 @@ class MathExpressionResponseProblem(MathExpressionProblem, ResponseProblem):
     def __init__(self, seed: int | None = None) -> None:
         super().__init__(seed)
         
-        self.problem_prompt: str = "Please evaluate the following mathematical expression. Respond only with the numerical value."
-        
     def generate_prompt(self, num_shots: int = 0) -> None:
         self.prompt = f"{self.problem_prompt}\n\n{self.problem}"
         
@@ -51,8 +58,6 @@ class MathExpressionResponseProblem(MathExpressionProblem, ResponseProblem):
 class MathExpressionMultipleChoiceProblem(MathExpressionProblem, MultipleChoiceProblem):
     def __init__(self, seed: int | None = None) -> None:
         super().__init__(seed)
-        
-        self.multiple_choice_prompt: str = "Select the choice that correctly evaluates the following mathematical expression. Respond only with the label corresponding to your choice."
 
     def generate_prompt(
         self,

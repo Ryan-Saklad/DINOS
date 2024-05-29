@@ -19,7 +19,7 @@ model_responses*.csv
 evaluation_results*.csv
 evaluations/
 *.zip
-*.json
+benchmark.json
 
 # PyCharm
 .idea/

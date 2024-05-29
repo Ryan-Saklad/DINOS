@@ -1,12 +1,19 @@
 from benchmark.problems.problem import BaseProblem, ResponseProblem, MultipleChoiceProblem
 
 class DyckLanguageProblem(BaseProblem):
-    def __init__(self, seed: int | None = None) -> None:
+    def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
         super().__init__(seed)
+
+        if not prompts:
+            import json
+
+            with open("benchmark/prompts/en/dyck_language_problem_prompts.json", "r") as f:
+                prompts = json.load(f)
 
         self.parens: list[tuple[str, str]] = [("(", ")"), ("[", "]"), ("{", "}"), ("<", ">")]
 
-        self.prompt: str = "Complete the following sequence, ensuring the parentheses are properly closed:"
+        self.problem_prompt: str = prompts["problem_prompt"]
+        self.multiple_choice_prompt: str = prompts["multiple_choice_prompt"]
 
     def generate(self, min_length: int = 5, max_length: int = 10) -> None:
         def generate_dyck_word(length: int) -> str:
@@ -39,8 +46,6 @@ class DyckLanguageProblem(BaseProblem):
 class DyckLanguageResponseProblem(DyckLanguageProblem, ResponseProblem):
     def __init__(self, seed: int | None = None) -> None:
         super().__init__(seed)
-
-        self.problem_prompt: str = "Complete the following sequence, ensuring the parentheses are properly closed."
     
     def generate_prompt(self, num_shots: int = 0) -> None:
         self.prompt = f"{self.problem_prompt}\n\n{self.problem}"
@@ -60,8 +65,6 @@ class DyckLanguageResponseProblem(DyckLanguageProblem, ResponseProblem):
 class DyckLanguageMultipleChoiceProblem(DyckLanguageProblem, MultipleChoiceProblem):
     def __init__(self, seed: int | None = None) -> None:
         super().__init__(seed)
-
-        self.multiple_choice_prompt: str = "Select the choice that correctly completes the following sequence, ensuring the parentheses are properly closed. Respond only with the label corresponding to your choice."
 
     def generate_prompt(
         self, 

@@ -1,0 +1,4 @@
+{
+    "problem_prompt": "Complete the following sequence, ensuring the parentheses are properly closed.",
+    "multiple_choice_prompt": "Select the choice that correctly completes the following sequence, ensuring the parentheses are properly closed. Respond only with the label corresponding to your choice."
+}

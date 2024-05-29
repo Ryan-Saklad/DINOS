@@ -2,9 +2,19 @@ from benchmark.problems.problem import BaseProblem, ResponseProblem, MultipleCho
 from utils.names import names
 
 class LiarProblem(BaseProblem):
-    def __init__(self, seed: int | None = None) -> None:
+    def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
         super().__init__(seed)
+
+        if not prompts:
+            import json
+
+            with open("benchmark/prompts/en/liar_problem_prompts.json", "r") as f:
+                prompts = json.load(f)
         
+        self.problem_prompt: str = prompts["problem_prompt"]
+        self.multiple_choice_prompt_t: str = prompts["multiple_choice_prompt_t"]
+        self.multiple_choice_prompt_f: str = prompts["multiple_choice_prompt_f"]
+
         self.names: list[str] = names
         self.truthfulness: dict[str, bool] = {}
         self.statements: list[str] = []
@@ -42,8 +52,6 @@ class LiarResponseProblem(LiarProblem, ResponseProblem):
     def __init__(self, seed: int | None = None) -> None:
         super().__init__(seed)
         
-        self.problem_prompt: str = "Determine the truthfulness ('True' or 'False') of the last person based on the following statements:"
-        
     def generate_prompt(self, num_shots: int = 0) -> None:
         self.prompt = f"{self.problem_prompt}\n\n{self.problem}\n\nIs {self.names[-1]} telling the truth? Answer 'True' or 'False'."
         
@@ -62,9 +70,6 @@ class LiarResponseProblem(LiarProblem, ResponseProblem):
 class LiarMultipleChoiceProblem(LiarProblem, MultipleChoiceProblem):
     def __init__(self, seed: int | None = None) -> None:
         super().__init__(seed)
-        
-        self.multiple_choice_prompt_t: str = "Select the choice where the last person mentioned is telling the truth based on the following statements. Respond only with the label corresponding to your choice."
-        self.multiple_choice_prompt_f: str = "Select the choice where the last person mentioned is a liar based on the following statements. Respond only with the label corresponding to your choice."
 
     def generate_prompt(
         self, 

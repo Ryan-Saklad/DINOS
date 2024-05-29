@@ -1,8 +1,17 @@
 from benchmark.problems.problem import BaseProblem, ResponseProblem, MultipleChoiceProblem
 
 class NavigateProblem(BaseProblem):
-    def __init__(self, seed: int | None = None) -> None:
+    def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
         super().__init__(seed)
+
+        if not prompts:
+            import json
+
+            with open("benchmark/prompts/en/navigate_problem_prompts.json", "r") as f:
+                prompts = json.load(f)
+        
+        self.problem_prompt: str = prompts["problem_prompt"]
+        self.multiple_choice_prompt_answer: str = prompts["multiple_choice_prompt_answer"]
 
     def generate(self, num_steps: int = 7, min_distance: int = 1, max_distance: int = 10) -> None:
         directions = ["forward", "left", "right", "backward"]
@@ -61,8 +70,6 @@ class NavigateResponseProblem(NavigateProblem, ResponseProblem):
     def __init__(self, seed: int | None = None) -> None:
         super().__init__(seed)
         
-        self.problem_prompt: str = "After following each instruction, where do you end up? Provide your answer as a pair of coordinates (x, y), where you always face forward."
-        
     def generate_prompt(self, num_shots: int = 0) -> None:
         self.prompt = f"{self.problem_prompt}\n\n{self.problem}"
         
@@ -81,8 +88,6 @@ class NavigateResponseProblem(NavigateProblem, ResponseProblem):
 class NavigateMultipleChoiceProblem(NavigateProblem, MultipleChoiceProblem):
     def __init__(self, seed: int | None = None) -> None:
         super().__init__(seed)
-        
-        self.multiple_choice_prompt_answer: str = "Select the choice that correctly provides the final coordinates after following the given instructions, where you always face forward. Respond only with the label corresponding to your choice."
 
     def generate_prompt(
         self,
