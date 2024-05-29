@@ -47,8 +47,8 @@ class BooleanExpressionProblem(BaseProblem):
         return str(eval(expression))
 
 class BooleanExpressionResponseProblem(BooleanExpressionProblem, ResponseProblem):
-    def __init__(self, seed: int | None = None) -> None:
-        super().__init__(seed)
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
     
     def generate_prompt(self, num_shots: int = 0) -> None:
         self.prompt = f"{self.problem_prompt}\n\n{self.problem}"
@@ -67,8 +67,9 @@ class BooleanExpressionResponseProblem(BooleanExpressionProblem, ResponseProblem
 
 
 class BooleanExpressionMultipleChoiceProblem(BooleanExpressionProblem, MultipleChoiceProblem):
-    def __init__(self, seed: int | None = None) -> None:
-        super().__init__(seed)
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+
     def generate_prompt(
         self, 
         num_shots: int = 0, 

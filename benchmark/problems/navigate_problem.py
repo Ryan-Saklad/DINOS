@@ -67,8 +67,8 @@ class NavigateProblem(BaseProblem):
         self.correct_answer = self.answer
 
 class NavigateResponseProblem(NavigateProblem, ResponseProblem):
-    def __init__(self, seed: int | None = None) -> None:
-        super().__init__(seed)
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
         
     def generate_prompt(self, num_shots: int = 0) -> None:
         self.prompt = f"{self.problem_prompt}\n\n{self.problem}"
@@ -86,8 +86,8 @@ class NavigateResponseProblem(NavigateProblem, ResponseProblem):
             self.prompt = f"{examples_str}\n\n{self.prompt}"
 
 class NavigateMultipleChoiceProblem(NavigateProblem, MultipleChoiceProblem):
-    def __init__(self, seed: int | None = None) -> None:
-        super().__init__(seed)
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
 
     def generate_prompt(
         self,

@@ -37,8 +37,8 @@ class MathExpressionProblem(BaseProblem):
         self.correct_answer = self.answer
 
 class MathExpressionResponseProblem(MathExpressionProblem, ResponseProblem):
-    def __init__(self, seed: int | None = None) -> None:
-        super().__init__(seed)
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
         
     def generate_prompt(self, num_shots: int = 0) -> None:
         self.prompt = f"{self.problem_prompt}\n\n{self.problem}"
@@ -56,8 +56,8 @@ class MathExpressionResponseProblem(MathExpressionProblem, ResponseProblem):
             self.prompt = f"{examples_str}\n\n{self.prompt}"
 
 class MathExpressionMultipleChoiceProblem(MathExpressionProblem, MultipleChoiceProblem):
-    def __init__(self, seed: int | None = None) -> None:
-        super().__init__(seed)
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
 
     def generate_prompt(
         self,

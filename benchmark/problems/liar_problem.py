@@ -49,8 +49,8 @@ class LiarProblem(BaseProblem):
         self.correct_answer = self.answer
 
 class LiarResponseProblem(LiarProblem, ResponseProblem):
-    def __init__(self, seed: int | None = None) -> None:
-        super().__init__(seed)
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
         
     def generate_prompt(self, num_shots: int = 0) -> None:
         self.prompt = f"{self.problem_prompt}\n\n{self.problem}\n\nIs {self.names[-1]} telling the truth? Answer 'True' or 'False'."
@@ -68,8 +68,8 @@ class LiarResponseProblem(LiarProblem, ResponseProblem):
             self.prompt = f"{examples_str}\n\n{self.prompt}"
 
 class LiarMultipleChoiceProblem(LiarProblem, MultipleChoiceProblem):
-    def __init__(self, seed: int | None = None) -> None:
-        super().__init__(seed)
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
 
     def generate_prompt(
         self, 
