@@ -1,13 +1,15 @@
+import json
+
 from benchmark.problems.problem import BaseProblem, ResponseProblem, MultipleChoiceProblem
-from utils.names import names
 
 class LiarProblem(BaseProblem):
     def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
         super().__init__(seed)
 
-        if not prompts:
-            import json
+        with open("utils/names.json") as f:
+            self.names: list[str] = json.load(f)["names"]
 
+        if not prompts:
             with open("benchmark/prompts/en/liar_problem_prompts.json", "r") as f:
                 prompts = json.load(f)
         
@@ -15,7 +17,6 @@ class LiarProblem(BaseProblem):
         self.multiple_choice_prompt_t: str = prompts["multiple_choice_prompt_t"]
         self.multiple_choice_prompt_f: str = prompts["multiple_choice_prompt_f"]
 
-        self.names: list[str] = names
         self.truthfulness: dict[str, bool] = {}
         self.statements: list[str] = []
         self.final_truth: bool = False
@@ -23,7 +24,7 @@ class LiarProblem(BaseProblem):
         
     def generate(self, num_people: int = 5) -> None:
         self.num_people = num_people
-        self.names = self.rng.sample(names, num_people)
+        self.names = self.rng.sample(self.names, num_people)
         self.truthfulness = {name: self.rng.choice([True, False]) for name in self.names}
         self.statement_style = self.rng.choice([True, False])
         
