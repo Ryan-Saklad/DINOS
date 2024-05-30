@@ -8,7 +8,7 @@ from utils.problem_type import ProblemType
 class BaseProblem(ABC):
     def __init__(self, seed: int | None = None) -> None:
         super().__init__()
-        self.problem_types: list[ProblemType] = [ProblemType.PROBLEM]
+        self.problem_types: list[ProblemType] = []
         self.seed: int | None = seed if seed is not None else random.randint(0, 1000000)
         self.rng: random.Random = random.Random(seed)
 
