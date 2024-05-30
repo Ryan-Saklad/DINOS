@@ -5,7 +5,7 @@ class BooleanExpressionProblem(BaseProblem):
     def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
         super().__init__(seed)
 
-        self.problem_name: str = "Boolean Expression Problem"
+        self.problem_name: str = "boolean_expression_problem"
 
         if not prompts:
             import json

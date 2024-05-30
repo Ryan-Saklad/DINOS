@@ -4,7 +4,7 @@ class NavigateProblem(BaseProblem):
     def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
         super().__init__(seed)
 
-        self.problem_name: str = "Navigate Problem"
+        self.problem_name: str = "navigate_problem"
 
         if not prompts:
             import json

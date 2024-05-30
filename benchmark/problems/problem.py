@@ -36,10 +36,12 @@ class BaseProblem(ABC):
 
     def generate_problem_json(self) -> dict:
         return {
-            "problem_name": self.problem_name,
-            "prompt": self.prompt,
-            "answer": self.answer,
-            "problem_types": [str(pt) for pt in self.problem_types]
+            f"{self.problem_name}_{'_'.join([str(pt) for pt in self.problem_types])}_{self.seed}": {
+                "problem_name": self.problem_name,
+                "prompt": self.prompt,
+                "answer": self.answer,
+                "problem_types": [str(pt) for pt in self.problem_types]
+            }
         }
 
 class ResponseProblem(BaseProblem, ABC):

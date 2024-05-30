@@ -6,7 +6,7 @@ class LiarProblem(BaseProblem):
     def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
         super().__init__(seed)
 
-        self.problem_name: str = "Liar Problem"
+        self.problem_name: str = "liar_problem"
 
         with open("utils/names.json") as f:
             self.names: list[str] = json.load(f)["names"]
