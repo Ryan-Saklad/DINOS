@@ -34,22 +34,19 @@ class BaseProblem(ABC):
     def get_answer(self) -> str:
         return self.answer
 
-    @abstractmethod
     def generate_problem_json(self) -> dict:
-        raise NotImplementedError
-
+        return {
+            "problem_name": self.problem_name,
+            "prompt": self.prompt,
+            "answer": self.answer,
+            "problem_types": [str(pt) for pt in self.problem_types]
+        }
 
 class ResponseProblem(BaseProblem, ABC):
     def __init__(self, seed: int | None = None) -> None:
         super().__init__(seed)
 
         self.problem_types.append(ProblemType.RESPONSE)
-
-    def generate_problem_json(self) -> dict:
-        return {
-            "prompt": self.prompt,
-            "answer": self.answer
-        }
 
 
 class MultipleChoiceProblem(BaseProblem, ABC):
@@ -122,8 +119,9 @@ class MultipleChoiceProblem(BaseProblem, ABC):
         raise NotImplementedError
 
     def generate_problem_json(self) -> dict:
-        return {
-            "prompt": self.prompt,
+        problem_json = super().generate_problem_json()
+        problem_json.update({
             "options": self.options,
-            "answer": self.correct_answer # Correct answer is used for the label of the correct option rather than the actual answer
-        }
+            "answer": self.correct_answer  # Correct answer is used for the label of the correct option rather than the actual answer
+        })
+        return problem_json

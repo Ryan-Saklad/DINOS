@@ -26,7 +26,7 @@ problem_classes: list = [
     NavigateMultipleChoiceProblem
 ]
 
-def generate_benchmark(seed: int | None = None, num_problems: int = 1000) -> dict:
+def generate_benchmark(seed: int | None = None, num_problems: int = 1000) -> dict[str, list[dict]]:
     SEED_MULTIPLIER: int = 1000000  # Problems sometimes iterate through seeds and this avoids collisions
     problems: list[dict] = []
 
@@ -34,13 +34,16 @@ def generate_benchmark(seed: int | None = None, num_problems: int = 1000) -> dic
         seed = random.randint(0, 1000000)
 
     for i in range(num_problems):
-        random.seed(seed + i * SEED_MULTIPLIER)
-        problem = random.choice(problem_classes)(seed=seed + i * SEED_MULTIPLIER)
+        problem_seed: int = seed + i * SEED_MULTIPLIER
+        random.seed(problem_seed)
+        problem = random.choice(problem_classes)(seed=problem_seed)
         problem.generate()
         problem.generate_prompt()
-        problems.append(problem.generate_problem_json())
+        problem_json: dict = problem.generate_problem_json()
+        problem_json['problem_seed'] = problem_seed
+        problems.append(problem_json)
 
-    return problems
+    return {"seed": seed, "problems": problems}
 
 def save_benchmark(benchmark: dict, path: str) -> None:
     with open(path, 'w') as f:

@@ -4,6 +4,8 @@ class DyckLanguageProblem(BaseProblem):
     def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
         super().__init__(seed)
 
+        self.problem_name: str = "Dyck Language Problem"
+
         if not prompts:
             import json
 
