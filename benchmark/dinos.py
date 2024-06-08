@@ -26,17 +26,22 @@ problem_classes: list = [
     NavigateMultipleChoiceProblem
 ]
 
-def generate_benchmark(seed: int | None = None, num_problems: int = 1000) -> dict[str, dict]:
+def generate_benchmark(seed: int | None = None, num_problems: int = 1000, max_problem_types: int = None) -> dict[str, dict]:
     SEED_MULTIPLIER: int = 1000000  # Problems sometimes iterate through seeds and this avoids collisions
     problems: dict = {}
 
     if seed is None:
         seed = random.randint(0, 1000000)
+    random.seed(seed)
+
+    selected_problem_classes = problem_classes
+    if max_problem_types is not None:
+        selected_problem_classes = random.sample(problem_classes, min(max_problem_types, len(problem_classes)))
 
     for i in range(num_problems):
         problem_seed: int = seed + i * SEED_MULTIPLIER
         random.seed(problem_seed)
-        problem = random.choice(problem_classes)(seed=problem_seed)
+        problem = random.choice(selected_problem_classes)(seed=problem_seed)
         problem.generate()
         problem.generate_prompt()
         problem_json: dict = problem.generate_problem_json()
@@ -54,10 +59,11 @@ def main():
     parser.add_argument('--seed', type=int, help='Seed for random number generator', default=None)
     parser.add_argument('--num_problems', type=int, help='Number of problems to generate', default=1000)
     parser.add_argument('--output', type=str, help='Output file path', default='benchmark.json')
+    parser.add_argument('--max_problem_types', type=int, help='Maximum number of types of problems to include', default=None)
     
     args = parser.parse_args()
 
-    benchmark = generate_benchmark(seed=args.seed, num_problems=args.num_problems)
+    benchmark = generate_benchmark(seed=args.seed, num_problems=args.num_problems, max_problem_types=args.max_problem_types)
     save_benchmark(benchmark, args.output)
 
 if __name__ == '__main__':
