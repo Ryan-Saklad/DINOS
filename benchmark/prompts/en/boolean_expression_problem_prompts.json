@@ -1,5 +1,12 @@
 {
-    "response_prompt": "Evaluate the provided boolean expression. Respond only with 'True' or 'False'.",
-    "multiple_choice_prompt_t": "Select the option that evaluates to True. Respond only with the label corresponding to your choice.",
-    "multiple_choice_prompt_f": "Select the option that evaluates to False. Respond only with the label corresponding to your choice."
+    "response_problem_prompt": "Evaluate the provided boolean expression. Respond only with 'True' or 'False'.",
+    "multiple_choice_problem_prompt_t": "Select the option that evaluates to True. Respond only with the label corresponding to your choice.",
+    "multiple_choice_problem_prompt_f": "Select the option that evaluates to False. Respond only with the label corresponding to your choice.",
+    "true_value": "True",
+    "false_value": "False",
+    "and_value": "and",
+    "or_value": "or",
+    "not_value": "not",
+    "start_parenthesis_value": "(",
+    "end_parenthesis_value": ")"
 }

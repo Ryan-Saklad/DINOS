@@ -14,6 +14,22 @@ class BaseProblem(ABC):
 
         self.answer: str = ""
 
+        self.prompts = self.get_default_prompts()
+
+    def get_default_prompts(self) -> dict:
+        prompts = {}
+        
+        with open("benchmark/prompts/en/response_prompts.json", "r") as f:
+            prompts.update(json.load(f))
+        
+        with open("benchmark/prompts/en/multiple_choice_prompts.json", "r") as f:
+            prompts.update(json.load(f))
+        
+        with open(f"benchmark/prompts/en/{self.problem_name}_prompts.json", "r") as f:
+            prompts.update(json.load(f))
+        
+        return prompts
+
     @abstractmethod
     def generate(self) -> None:
         raise NotImplementedError
@@ -26,6 +42,14 @@ class BaseProblem(ABC):
         Args:
             num_shots (int): The number of example problems to include in the prompt. Default is 0.
         """
+        raise NotImplementedError
+
+    @abstractmethod
+    def generate_problem_str(self) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def generate_answer_str(self) -> None:
         raise NotImplementedError
 
     def validate(self, response: str) -> bool:
@@ -130,10 +154,30 @@ class MultipleChoiceProblem(BaseProblem, ABC):
     ) -> None:
         raise NotImplementedError
 
+    def generate_multiple_choice_prompt(
+        self, 
+        multiple_choice_problem_prompt: str, 
+        options: str, 
+        multiple_choice_prompt: str | None = None,
+        examples: str | None = None
+    ) -> None:
+        if multiple_choice_prompt is None:
+            if examples:
+                multiple_choice_prompt = self.prompts["multiple_choice_prompt_w_examples"]
+            else:
+                multiple_choice_prompt = self.prompts["multiple_choice_prompt"]
+
+        self.prompt = multiple_choice_prompt.format(
+            multiple_choice_problem_prompt=multiple_choice_problem_prompt,
+            options=options,
+            examples=examples if examples else ""
+        )
+
     def generate_problem_json(self, problem_id: int | None = None) -> dict:
         problem_json = super().generate_problem_json(problem_id)
         problem_json.update({
             "options": self.options,
-            "answer": self.correct_answer  # Correct answer is used for the label of the correct option rather than the actual answer
+            "answer": self.answer
         })
+
         return problem_json
