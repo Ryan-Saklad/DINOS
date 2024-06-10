@@ -34,15 +34,25 @@ class BaseProblem(ABC):
     def get_answer(self) -> str:
         return self.answer
 
-    def generate_problem_json(self) -> dict:
-        return {
-            f"{self.problem_name}_{'_'.join([str(pt) for pt in self.problem_types])}_{self.seed}": {
-                "problem_name": self.problem_name,
-                "prompt": self.prompt,
-                "answer": self.answer,
-                "problem_types": [str(pt) for pt in self.problem_types]
+    def generate_problem_json(self, problem_id: int | None = None) -> dict:
+        if problem_id is None:
+            return {
+                f"{self.problem_name}_{'_'.join([str(pt) for pt in self.problem_types])}_{self.seed}": {
+                    "problem_name": self.problem_name,
+                    "prompt": self.prompt,
+                    "answer": self.answer,
+                    "problem_types": [str(pt) for pt in self.problem_types]
+                }
             }
-        }
+        else:
+            return {
+                f"{problem_id}": {
+                    "problem_name": self.problem_name,
+                    "prompt": self.prompt,
+                    "answer": self.answer,
+                    "problem_types": [str(pt) for pt in self.problem_types]
+                }
+            }
 
 class ResponseProblem(BaseProblem, ABC):
     def __init__(self, seed: int | None = None) -> None:
@@ -120,8 +130,8 @@ class MultipleChoiceProblem(BaseProblem, ABC):
     ) -> None:
         raise NotImplementedError
 
-    def generate_problem_json(self) -> dict:
-        problem_json = super().generate_problem_json()
+    def generate_problem_json(self, problem_id: int | None = None) -> dict:
+        problem_json = super().generate_problem_json(problem_id)
         problem_json.update({
             "options": self.options,
             "answer": self.correct_answer  # Correct answer is used for the label of the correct option rather than the actual answer

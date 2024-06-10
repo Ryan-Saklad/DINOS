@@ -44,7 +44,7 @@ def generate_benchmark(seed: int | None = None, num_problems: int = 1000, max_pr
         problem = random.choice(selected_problem_classes)(seed=problem_seed)
         problem.generate()
         problem.generate_prompt()
-        problem_json: dict = problem.generate_problem_json()
+        problem_json: dict = problem.generate_problem_json(i)
         problem_key = next(iter(problem_json))  # Get the first (and only) key from the dictionary
         problems[problem_key] = problem_json[problem_key]
 
