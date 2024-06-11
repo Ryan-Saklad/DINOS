@@ -1,6 +1,6 @@
 {
     "multiple_choice_answer_choice": "{label}. {option}",
-    "multiple_choice_example": "{example}\n\n",
+    "multiple_choice_example": "{problem_prompt}\n{answer}\n\n",
     "multiple_choice_prompt": "{multiple_choice_problem_prompt}\n\nOptions:\n{options}",
     "multiple_choice_prompt_w_examples": "{examples}{multiple_choice_problem_prompt}\n\nOptions:\n{options}"
 }

@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from utils.problem_type import ProblemType
 
 class BaseProblem(ABC):
-    def __init__(self, seed: int | None = None) -> None:
+    def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
         super().__init__()
         self.problem_types: list[ProblemType] = []
         self.seed: int | None = seed if seed is not None else random.randint(0, 1000000)
@@ -15,6 +15,9 @@ class BaseProblem(ABC):
         self.answer: str = ""
 
         self.prompts = self.get_default_prompts()
+
+        if prompts is not None:
+            self.prompts.update(prompts)
 
     def get_default_prompts(self) -> dict:
         prompts = {}
@@ -42,14 +45,6 @@ class BaseProblem(ABC):
         Args:
             num_shots (int): The number of example problems to include in the prompt. Default is 0.
         """
-        raise NotImplementedError
-
-    @abstractmethod
-    def generate_problem_str(self) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    def generate_answer_str(self) -> None:
         raise NotImplementedError
 
     def validate(self, response: str) -> bool:

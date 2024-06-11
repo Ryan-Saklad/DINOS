@@ -2,13 +2,9 @@ from benchmark.problems.problem import BaseProblem, ResponseProblem, MultipleCho
 
 
 class BooleanExpressionProblem(BaseProblem):
-    def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
+    def __init__(self, **kwargs) -> None:
         self.problem_name: str = "boolean_expression_problem"
-
-        super().__init__(seed)
-
-        if prompts is not None:
-            self.prompts.update(prompts)
+        super().__init__(**kwargs)
 
         self.bool_values: list[str] = ["True", "False"]
         self.operators: list[str] = ["and", "or"]
@@ -93,9 +89,9 @@ class BooleanExpressionResponseProblem(BooleanExpressionProblem, ResponseProblem
             example_problem = BooleanExpressionResponseProblem(seed=self.seed + i)
             example_problem.generate(min_depth=self.depth, max_depth=self.depth)
             example_problem.generate_prompt(num_shots=0)
-            examples.append(f"{example_problem.prompt}\n{example_problem.answer}")
+            examples.append(self.prompts["response_example"].format(problem_prompt=example_problem.prompt, answer=example_problem.answer))
         
-        return "\n\n".join([self.prompts["response_example"].format(example=example) for example in examples])
+        return "".join(example for example in examples)
 
 
 class BooleanExpressionMultipleChoiceProblem(BooleanExpressionProblem, MultipleChoiceProblem):
@@ -122,7 +118,6 @@ class BooleanExpressionMultipleChoiceProblem(BooleanExpressionProblem, MultipleC
         )
         
         values, seed_increment = self._create_additional_choices(num_options)
-        self.rng.shuffle(values)
         self.options = dict(zip(option_labels, values))
         self.option_labels = option_labels
 
@@ -162,6 +157,7 @@ class BooleanExpressionMultipleChoiceProblem(BooleanExpressionProblem, MultipleC
             if new_problem._answer != self._answer and new_problem.problem not in values:
                 values.append(new_problem.problem)
 
+        self.rng.shuffle(values)
         return values, seed_increment
 
     def _generate_examples_for_multiple_choice(
@@ -193,7 +189,7 @@ class BooleanExpressionMultipleChoiceProblem(BooleanExpressionProblem, MultipleC
                 randomize=randomize
             )
             examples.append(
-                f"{example_problem.prompt}\n{example_problem._answer}"
+                self.prompts["multiple_choice_example"].format(problem_prompt=example_problem.prompt, answer=example_problem.answer)
             )
         
-        return "\n\n".join([self.prompts["multiple_choice_example"].format(example=example) for example in examples])
+        return "".join(example for example in examples)
