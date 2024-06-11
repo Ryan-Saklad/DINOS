@@ -1,4 +1,5 @@
 {
+    "response_example": "{example}\n\n",
     "response_prompt": "{response_problem_prompt}\n\n{response_problem}",
-    "response_prompt_w_examples": "{examples}\n\n{response_problem_prompt}\n\n{response_problem}"
+    "response_prompt_w_examples": "{examples}{response_problem_prompt}\n\n{response_problem}"
 }

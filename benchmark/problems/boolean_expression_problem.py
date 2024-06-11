@@ -10,14 +10,6 @@ class BooleanExpressionProblem(BaseProblem):
         if prompts is not None:
             self.prompts.update(prompts)
 
-        self.true_value = self.prompts["true_value"]
-        self.false_value = self.prompts["false_value"]
-        self.and_value = self.prompts["and_value"]
-        self.or_value = self.prompts["or_value"]
-        self.not_value = self.prompts["not_value"]
-        self.start_parenthesis_value = self.prompts["start_parenthesis_value"]
-        self.end_parenthesis_value = self.prompts["end_parenthesis_value"]
-
         self.bool_values: list[str] = ["True", "False"]
         self.operators: list[str] = ["and", "or"]
         self.unary_operator: str = "not"
@@ -51,25 +43,25 @@ class BooleanExpressionProblem(BaseProblem):
     def generate_problem_str(self) -> None:
         self.problem = (
             self._problem
-            .replace("True", self.true_value)
-            .replace("False", self.false_value)
-            .replace("and", self.and_value)
-            .replace("or", self.or_value)
-            .replace("not", self.not_value)
-            .replace("(", self.start_parenthesis_value)
-            .replace(")", self.end_parenthesis_value)
+            .replace("True", self.prompts["true_value"])
+            .replace("False", self.prompts["false_value"])
+            .replace("and", self.prompts["and_value"])
+            .replace("or", self.prompts["or_value"])
+            .replace("not", self.prompts["not_value"])
+            .replace("(", self.prompts["start_parenthesis_value"])
+            .replace(")", self.prompts["end_parenthesis_value"])
         )
 
     def generate_answer_str(self) -> None:
         self.answer: str = (
             self._answer
-            .replace("True", self.true_value)
-            .replace("False", self.false_value)
-            .replace("and", self.and_value)
-            .replace("or", self.or_value)
-            .replace("not", self.not_value)
-            .replace("(", self.start_parenthesis_value)
-            .replace(")", self.end_parenthesis_value)
+            .replace("True", self.prompts["true_value"])
+            .replace("False", self.prompts["false_value"])
+            .replace("and", self.prompts["and_value"])
+            .replace("or", self.prompts["or_value"])
+            .replace("not", self.prompts["not_value"])
+            .replace("(", self.prompts["start_parenthesis_value"])
+            .replace(")", self.prompts["end_parenthesis_value"])
         )
 
     def _evaluate(self, expression: str) -> str:
@@ -103,7 +95,7 @@ class BooleanExpressionResponseProblem(BooleanExpressionProblem, ResponseProblem
             example_problem.generate_prompt(num_shots=0)
             examples.append(f"{example_problem.prompt}\n{example_problem.answer}")
         
-        return "\n\n".join(examples)
+        return "\n\n".join([self.prompts["response_example"].format(example=example) for example in examples])
 
 
 class BooleanExpressionMultipleChoiceProblem(BooleanExpressionProblem, MultipleChoiceProblem):
@@ -204,4 +196,4 @@ class BooleanExpressionMultipleChoiceProblem(BooleanExpressionProblem, MultipleC
                 f"{example_problem.prompt}\n{example_problem._answer}"
             )
         
-        return "\n\n".join(examples)
+        return "\n\n".join([self.prompts["multiple_choice_example"].format(example=example) for example in examples])
