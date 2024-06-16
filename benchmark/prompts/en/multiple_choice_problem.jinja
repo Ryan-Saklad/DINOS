@@ -1,0 +1,5 @@
+{% for example in examples %}
+{% include "multiple_choice_format.jinja" with context %}
+{{ example.answer }}
+{% endfor %}
+{% include "multiple_choice_format.jinja" with context %}

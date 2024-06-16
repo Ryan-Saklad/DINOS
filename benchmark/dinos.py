@@ -6,6 +6,7 @@ from tqdm import tqdm
 
 from benchmark.problems.problem import BaseProblem
 from utils.problem_type import ProblemType
+from benchmark.config import Config
 
 from benchmark.problems.boolean_expression_problem import BooleanExpressionResponseProblem, BooleanExpressionMultipleChoiceProblem
 from benchmark.problems.dyck_language_problem import DyckLanguageResponseProblem, DyckLanguageMultipleChoiceProblem
@@ -16,12 +17,12 @@ from benchmark.problems.navigate_problem import NavigateResponseProblem, Navigat
 problem_classes: list = [
     BooleanExpressionResponseProblem, 
     BooleanExpressionMultipleChoiceProblem, 
-    DyckLanguageResponseProblem, 
-    DyckLanguageMultipleChoiceProblem, 
-    LiarResponseProblem, 
-    LiarMultipleChoiceProblem, 
-    MathExpressionResponseProblem, 
-    MathExpressionMultipleChoiceProblem, 
+    # DyckLanguageResponseProblem, 
+    # DyckLanguageMultipleChoiceProblem, 
+    # LiarResponseProblem, 
+    # LiarMultipleChoiceProblem, 
+    # MathExpressionResponseProblem, 
+    # MathExpressionMultipleChoiceProblem, 
     # NavigateResponseProblem, 
     # NavigateMultipleChoiceProblem
 ]
@@ -30,18 +31,15 @@ def generate_benchmark(seed: int | None = None, num_problems: int = 1000, max_pr
     SEED_MULTIPLIER: int = 1000000  # Problems sometimes iterate through seeds and this avoids collisions
     problems: dict = {}
 
-    if seed is None:
-        seed = random.randint(0, 1000000)
-    random.seed(seed)
+    config = Config(seed=seed)
 
     selected_problem_classes = problem_classes
     if max_problem_types is not None:
         selected_problem_classes = random.sample(problem_classes, min(max_problem_types, len(problem_classes)))
 
     for i in range(num_problems):
-        problem_seed: int = seed + i * SEED_MULTIPLIER
-        random.seed(problem_seed)
-        problem = random.choice(selected_problem_classes)(seed=problem_seed)
+        config.increment_seed()
+        problem = config.rng.choice(selected_problem_classes)(config=config)
         problem.generate()
         problem.generate_prompt(num_shots=num_shots)
         problem_json: dict = problem.generate_problem_json(i)

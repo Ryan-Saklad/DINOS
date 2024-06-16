@@ -1,0 +1,26 @@
+{% set new_true_value = "True" %}
+{% set new_false_value = "False" %}
+{% set new_and_operator = "and" %}
+{% set new_or_operator = "or" %}
+{% set new_not_operator = "not" %}
+{% set new_start_parenthesis_value = "(" %}
+{% set new_end_parenthesis_value = ")" %}
+{% set problem = Problem.problem %}
+{% set problem = problem.replace("True", new_true_value) %}
+{% set problem = problem.replace("False", new_false_value) %}
+{% set problem = problem.replace("and", new_and_operator) %}
+{% set problem = problem.replace("or", new_or_operator) %}
+{% set problem = problem.replace("not", new_not_operator) %}
+{% set problem = problem.replace("(", new_start_parenthesis_value) %}
+{% set problem = problem.replace(")", new_end_parenthesis_value) %}
+{% if ProblemType.RESPONSE in Problem.problem_types %}
+Evaluate the provided boolean expression. Respond only with 'True' or 'False'.
+{{ problem }}
+{% elif ProblemType.MULTIPLE_CHOICE in Problem.problem_types %}
+{% if Problem._answer == "True" %}
+Select the option that evaluates to {{ new_true_value }}. Respond only with the label corresponding to your choice.
+{% else %}
+Select the option that evaluates to {{ new_false_value }}. Respond only with the label corresponding to your choice.
+{% endif %}
+{% include "multiple_choice_problem.jinja" with context %}
+{% endif %}
