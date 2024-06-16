@@ -14,14 +14,14 @@ from benchmark.problems.math_expression_problem import MathExpressionResponsePro
 from benchmark.problems.navigate_problem import NavigateResponseProblem, NavigateMultipleChoiceProblem
 
 problem_classes: list = [
-    # BooleanExpressionResponseProblem, 
-    # BooleanExpressionMultipleChoiceProblem, 
-    # DyckLanguageResponseProblem, 
-    # DyckLanguageMultipleChoiceProblem, 
+    BooleanExpressionResponseProblem, 
+    BooleanExpressionMultipleChoiceProblem, 
+    DyckLanguageResponseProblem, 
+    DyckLanguageMultipleChoiceProblem, 
     LiarResponseProblem, 
     LiarMultipleChoiceProblem, 
-    # MathExpressionResponseProblem, 
-    # MathExpressionMultipleChoiceProblem, 
+    MathExpressionResponseProblem, 
+    MathExpressionMultipleChoiceProblem, 
     # NavigateResponseProblem, 
     # NavigateMultipleChoiceProblem
 ]

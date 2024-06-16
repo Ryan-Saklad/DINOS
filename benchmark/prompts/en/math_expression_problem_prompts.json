@@ -1,4 +1,5 @@
 {
-    "response_prompt": "Please evaluate the following mathematical expression. Respond only with the numerical value.",
-    "multiple_choice_prompt": "Select the choice that correctly evaluates the following mathematical expression. Respond only with the label corresponding to your choice."
+    "response_problem_prompt": "Please evaluate the following mathematical expression. Respond only with the numerical value.",
+    "multiple_choice_evaluate_problem_prompt": "Select the choice that correctly evaluates the mathematical expression {problem}. Respond only with the label corresponding to your choice.",
+    "multiple_choice_select_problem_prompt": "Select the option that evaluates to {answer}. Respond only with the label corresponding to your choice."
 }
