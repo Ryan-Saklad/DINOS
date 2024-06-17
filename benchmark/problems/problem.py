@@ -27,6 +27,19 @@ class BaseProblem(ABC):
     def generate_prompt(self, num_shots: int = 0) -> None:
         raise NotImplementedError
 
+    def _generate_examples(self, num_shots: int) -> list["BaseProblem"]:
+        examples = []
+        for i in range(num_shots):
+            self.config.increment_seed()
+            # Create an instance of the subclass from which this method is called
+            example_problem = type(self)(config=self.config)
+            example_problem.problem_types = self.problem_types  # Guarentees the correct type of problem is created
+            example_problem.generate(**vars(self))
+            example_problem.generate_prompt(num_shots=0)
+            examples.append(example_problem)
+
+        return examples
+
     def generate_problem_json(self, problem_id: int | None = None) -> dict:
         if problem_id is None:
             return {
@@ -57,16 +70,6 @@ class ResponseProblem(BaseProblem, ABC):
     def generate_prompt(self, num_shots: int = 0) -> None:
         self.prompt: str = self.render_template(examples=self._generate_examples(num_shots))
 
-    def _generate_examples(self, num_shots: int) -> list['ResponseProblem']:
-        examples = []
-        for i in range(num_shots):
-            self.config.increment_seed()
-            # Create an instance of the subclass from which this method is called
-            example_problem = type(self)(config=self.config)
-            example_problem.generate(**vars(self))
-            example_problem.generate_prompt(num_shots=0)
-            examples.append(example_problem)
-        return examples
 
 class MultipleChoiceProblem(BaseProblem, ABC):
     def __init__(self, config: Config) -> None:
@@ -138,19 +141,6 @@ class MultipleChoiceProblem(BaseProblem, ABC):
         self.option_labels = option_labels
 
         self.prompt = self.render_template(examples=self._generate_examples(num_shots))
-
-    def _generate_examples(self, num_shots: int) -> list[BaseProblem]:
-        examples = []
-        for i in range(num_shots):
-            self.config.increment_seed()
-            # Create an instance of the subclass from which this method is called
-            example_problem = type(self)(config=self.config)
-            example_problem.problem_types = self.problem_types  # Guarentees the correct type of problem is created
-            example_problem.generate(**vars(self))
-            example_problem.generate_prompt(num_shots=0)
-            examples.append(example_problem)
-
-        return examples
 
     def _create_additional_choices(self, option_labels: list[str], num_options: int) -> tuple[list[tuple[str, ResponseProblem]], str, int]:
         option_pairs: list[tuple[str, ResponseProblem]] = [(label, None) for label in option_labels]
