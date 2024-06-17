@@ -128,6 +128,7 @@ class NavigateMultipleChoiceProblem(NavigateProblem, MultipleChoiceProblem):
 
         problems = []
         while len(problems) < num_options - 1:
+            self.config.increment_seed()
             new_problem = NavigateResponseProblem(config=self.config)
             new_problem.generate(min_num_steps=self.num_steps, max_num_steps=self.num_steps, min_distance=self.min_distance, max_distance=self.max_distance)
 

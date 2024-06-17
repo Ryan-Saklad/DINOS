@@ -104,6 +104,7 @@ class BooleanExpressionMultipleChoiceProblem(BooleanExpressionProblem, MultipleC
 
         problems = []
         while len(problems) < num_options - 1:
+            self.config.increment_seed()
             new_problem = BooleanExpressionResponseProblem(config=self.config)
             new_problem.generate(min_depth=self.depth, max_depth=self.depth)
 

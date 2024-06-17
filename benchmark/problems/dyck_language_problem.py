@@ -102,6 +102,7 @@ class DyckLanguageMultipleChoiceProblem(DyckLanguageProblem, MultipleChoiceProbl
 
         problems = []
         while len(problems) < num_options - 1:
+            self.config.increment_seed()
             new_problem = DyckLanguageResponseProblem(config=self.config)
             new_problem.generate(min_length=self.length, max_length=self.length)
 

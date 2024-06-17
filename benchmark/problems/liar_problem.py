@@ -120,6 +120,7 @@ class LiarMultipleChoiceProblem(LiarProblem, MultipleChoiceProblem):
 
         problems = []
         while len(problems) < num_options - 1:
+            self.config.increment_seed()
             new_problem = LiarResponseProblem(config=self.config)
             new_problem.generate(num_people=self.num_people)
 
