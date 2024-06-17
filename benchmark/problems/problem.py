@@ -152,6 +152,33 @@ class MultipleChoiceProblem(BaseProblem, ABC):
 
         return examples
 
+    def _create_additional_choices(self, option_labels: list[str], num_options: int) -> tuple[list[tuple[str, ResponseProblem]], str, int]:
+        option_pairs: list[tuple[str, ResponseProblem]] = [(label, None) for label in option_labels]
+
+        # Set the correct answer to this problem to a random label
+        random_label = self.config.rng.choice([label for label, option in option_pairs if option is None])
+        for i, (label, option) in enumerate(option_pairs):
+            if label == random_label:
+                option_pairs[i] = (label, self)
+                correct_label = label
+                break
+
+        problems = []
+        while len(problems) < num_options - 1:
+            self.config.increment_seed()
+            new_problem = self.problems["response"](config=self.config)
+            new_problem.problem_types = self.problem_types  # Guarentees the correct type of problem is created
+            new_problem.generate(**vars(self))
+
+            if new_problem._answer != self._answer and new_problem.problem not in [option.problem for label, option in option_pairs if option is not None]:
+                problems.append(new_problem)
+
+        for i, (label, option) in enumerate(option_pairs):
+            if option is None and problems:
+                option_pairs[i] = (label, problems.pop(0))
+
+        return option_pairs, correct_label
+
     def generate_problem_json(self, problem_id: int | None = None) -> dict:
         problem_json = super().generate_problem_json(problem_id)
         problem_json.update({

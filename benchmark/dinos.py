@@ -14,7 +14,7 @@ from benchmark.problems.liar_problem import LiarResponseProblem, LiarMultipleCho
 from benchmark.problems.math_expression_problem import MathExpressionResponseProblem, MathExpressionMultipleChoiceProblem
 from benchmark.problems.navigate_problem import NavigateResponseProblem, NavigateMultipleChoiceProblem
 
-problem_classes: list = [
+problem_classes: list[BaseProblem] = [
     BooleanExpressionResponseProblem, 
     BooleanExpressionMultipleChoiceProblem, 
     DyckLanguageResponseProblem, 
@@ -52,7 +52,7 @@ def save_benchmark(benchmark: dict, path: str) -> None:
     with open(path, 'w') as f:
         json.dump(benchmark, f, indent=4)
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Generate a DINOS benchmark.")
     parser.add_argument('--seed', type=int, help='Seed for random number generator', default=None)
     parser.add_argument('--num_problems', type=int, help='Number of problems to generate', default=1000)
