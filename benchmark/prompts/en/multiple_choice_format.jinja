@@ -1,5 +1,10 @@
 {{ instruction }}
 
 Options:
+{% if ProblemType.CHOOSE_MATCHING_EXPRESSION in Problem.problem_types %}
 {% for label in Problem.option_labels %}{{label}}. {{Problem.options[label].problem}}
 {% endfor %}
+{% elif ProblemType.SOLVE_EXPRESSION in Problem.problem_types %}
+{% for label in Problem.option_labels %}{{label}}. {{Problem.options[label]._answer}}
+{% endfor %}
+{% endif %}

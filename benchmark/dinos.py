@@ -9,9 +9,9 @@ from utils.problem_type import ProblemType
 from benchmark.config import Config
 
 from benchmark.problems.boolean_expression_problem import BooleanExpressionResponseProblem, BooleanExpressionMultipleChoiceProblem
-from benchmark.problems.dyck_language_problem import DyckLanguageResponseProblem, DyckLanguageMultipleChoiceProblem
-from benchmark.problems.liar_problem import LiarResponseProblem, LiarMultipleChoiceProblem
-from benchmark.problems.math_expression_problem import MathExpressionResponseProblem, MathExpressionMultipleChoiceProblem
+# from benchmark.problems.dyck_language_problem import DyckLanguageResponseProblem, DyckLanguageMultipleChoiceProblem
+# from benchmark.problems.liar_problem import LiarResponseProblem, LiarMultipleChoiceProblem
+# from benchmark.problems.math_expression_problem import MathExpressionResponseProblem, MathExpressionMultipleChoiceProblem
 from benchmark.problems.navigate_problem import NavigateResponseProblem, NavigateMultipleChoiceProblem
 
 problem_classes: list = [

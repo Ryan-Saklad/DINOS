@@ -1,0 +1,7 @@
+{% if ProblemType.RESPONSE in Problem.problem_types %}
+{% set instruction = "Complete the following sequence, ensuring the parentheses are properly closed." %}
+{% include "response_problem.jinja" with context %}
+{% elif ProblemType.MULTIPLE_CHOICE in Problem.problem_types %}
+{% set instruction = "Select the choice that correctly completes the sequence " ~ Problem.problem ~ " ensuring the parentheses are properly closed. Respond only with the label corresponding to your choice." %}
+{% include "multiple_choice_problem.jinja" with context %}
+{% endif %}

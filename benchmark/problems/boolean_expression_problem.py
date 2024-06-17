@@ -1,4 +1,5 @@
 from benchmark.problems.problem import BaseProblem, ResponseProblem, MultipleChoiceProblem
+from utils.problem_type import ProblemType
 
 
 class BooleanExpressionProblem(BaseProblem):
@@ -85,6 +86,8 @@ class BooleanExpressionMultipleChoiceProblem(BooleanExpressionProblem, MultipleC
         self.answer = correct_label
         self.options = dict(option_pairs)
         self.option_labels = option_labels
+
+        self.problem_types.append(ProblemType.CHOOSE_MATCHING_EXPRESSION)
 
         self.prompt = self.render_template(examples=self._generate_examples(num_shots))
 

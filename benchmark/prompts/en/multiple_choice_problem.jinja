@@ -1,5 +1,9 @@
 {% for example in examples %}
 {{ example.prompt }}
+{% if ProblemType.CHOOSE_MATCHING_EXPRESSION in Problem.problem_types %}
 {{ example.answer }}
+{% elif ProblemType.SOLVE_EXPRESSION in Problem.problem_types %}
+{{ example.problem }}
+{% endif %}
 {% endfor %}
 {% include "multiple_choice_format.jinja" with context %}
