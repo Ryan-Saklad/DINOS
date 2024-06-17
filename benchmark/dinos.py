@@ -12,11 +12,11 @@ from benchmark.problems.boolean_expression_problem import BooleanExpressionRespo
 from benchmark.problems.dyck_language_problem import DyckLanguageResponseProblem, DyckLanguageMultipleChoiceProblem
 from benchmark.problems.liar_problem import LiarResponseProblem, LiarMultipleChoiceProblem
 from benchmark.problems.math_expression_problem import MathExpressionResponseProblem, MathExpressionMultipleChoiceProblem
-# from benchmark.problems.navigate_problem import NavigateResponseProblem, NavigateMultipleChoiceProblem
+from benchmark.problems.navigate_problem import NavigateResponseProblem, NavigateMultipleChoiceProblem
 
 problem_classes: list = [
-    BooleanExpressionResponseProblem, 
-    BooleanExpressionMultipleChoiceProblem, 
+    # BooleanExpressionResponseProblem, 
+    # BooleanExpressionMultipleChoiceProblem, 
     # DyckLanguageResponseProblem, 
     # DyckLanguageMultipleChoiceProblem, 
     # LiarResponseProblem, 
@@ -46,7 +46,7 @@ def generate_benchmark(seed: int | None = None, num_problems: int = 1000, max_pr
         problem_key = next(iter(problem_json))  # Get the first (and only) key from the dictionary
         problems[problem_key] = problem_json[problem_key]
 
-    return {"seed": seed, "problems": problems}
+    return {"seed": config.seed, "problems": problems}
 
 def save_benchmark(benchmark: dict, path: str) -> None:
     with open(path, 'w') as f:

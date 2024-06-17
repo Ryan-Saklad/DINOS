@@ -1,4 +1,0 @@
-{
-    "problem_prompt": "After following each instruction, where do you end up? Provide your answer as a pair of coordinates (x, y), where you always face forward.",
-    "multiple_choice_prompt_answer": "Select the choice that correctly provides the final coordinates after following the given instructions, where you always face forward. Respond only with the label corresponding to your choice."
-}
