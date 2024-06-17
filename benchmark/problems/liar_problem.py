@@ -71,6 +71,4 @@ class LiarResponseProblem(LiarProblem, ResponseProblem):
 
 class LiarMultipleChoiceProblem(LiarProblem, MultipleChoiceProblem):
     def generate_prompt(self, **kwargs) -> None:
-        if ProblemType.CHOOSE_MATCHING_EXPRESSION not in self.problem_types:
-            self.problem_types.append(ProblemType.CHOOSE_MATCHING_EXPRESSION)
-        super().generate_prompt(**kwargs)
+        super().generate_prompt(ProblemType.CHOOSE_MATCHING_EXPRESSION, **kwargs)

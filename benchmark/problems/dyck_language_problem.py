@@ -52,6 +52,4 @@ class DyckLanguageResponseProblem(DyckLanguageProblem, ResponseProblem):
 
 class DyckLanguageMultipleChoiceProblem(DyckLanguageProblem, MultipleChoiceProblem):
     def generate_prompt(self, **kwargs) -> None:
-        if ProblemType.SOLVE_EXPRESSION not in self.problem_types:
-            self.problem_types.append(ProblemType.SOLVE_EXPRESSION)
-        super().generate_prompt(**kwargs)
+        super().generate_prompt(ProblemType.SOLVE_EXPRESSION, **kwargs)

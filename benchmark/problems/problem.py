@@ -114,15 +114,23 @@ class MultipleChoiceProblem(BaseProblem, ABC):
         return options[:num_options]
 
     def generate_prompt(
-        self, 
-        num_shots: int = 0, 
+        self,
+        problem_types: list[ProblemType] | ProblemType,
+        num_shots: int = 0,
         num_options: int = 2,
-        use_uppercase: bool = True, 
-        use_lowercase: bool = False, 
-        use_numbers: bool = False, 
-        prevent_same_letter_case: bool = False, 
+        use_uppercase: bool = True,
+        use_lowercase: bool = False,
+        use_numbers: bool = False,
+        prevent_same_letter_case: bool = False,
         randomize: bool = False
     ) -> None:
+        if isinstance(problem_types, ProblemType):
+            problem_types = [problem_types]
+
+        for problem_type in problem_types:
+            if problem_type not in self.problem_types:
+                self.problem_types.append(problem_type)
+
         option_labels = self._generate_option_labels(
             num_options, 
             use_uppercase, 

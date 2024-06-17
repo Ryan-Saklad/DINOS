@@ -48,38 +48,15 @@ class MathExpressionResponseProblem(MathExpressionProblem, ResponseProblem):
 
 
 class MathExpressionMultipleChoiceProblem(MathExpressionProblem, MultipleChoiceProblem):
-    def generate_prompt(
-        self, 
-        num_shots: int = 0, 
-        num_options: int = 2,
-        use_uppercase: bool = True, 
-        use_lowercase: bool = False, 
-        use_numbers: bool = False, 
-        prevent_same_letter_case: bool = False, 
-        randomize: bool = False
-    ) -> None:
-        option_labels = self._generate_option_labels(
-            num_options, 
-            use_uppercase, 
-            use_lowercase, 
-            use_numbers, 
-            prevent_same_letter_case, 
-            randomize
-        )
-
-        option_pairs: list[tuple[str, ResponseProblem]]
-        correct_label: str
-
-        option_pairs, correct_label = self._create_additional_choices(option_labels, num_options)
-        self.answer = correct_label
-        self.options = dict(option_pairs)
-        self.option_labels = option_labels
-
+    def generate_prompt(self, **kwargs) -> None:
         if ProblemType.SOLVE_EXPRESSION not in self.problem_types and ProblemType.CHOOSE_MATCHING_EXPRESSION not in self.problem_types:
             if self.config.rng.choice([True, False]):
-                self.problem_types.append(ProblemType.SOLVE_EXPRESSION)
+                super().generate_prompt(ProblemType.SOLVE_EXPRESSION, **kwargs)
             else:
-                self.problem_types.append(ProblemType.CHOOSE_MATCHING_EXPRESSION)
-        # Otherwise, one of the two problem types is already set
-
-        self.prompt = self.render_template(examples=self._generate_examples(num_shots))
+                super().generate_prompt(ProblemType.CHOOSE_MATCHING_EXPRESSION, **kwargs)
+        elif ProblemType.SOLVE_EXPRESSION in self.problem_types:
+            super().generate_prompt(ProblemType.SOLVE_EXPRESSION, **kwargs)
+        elif ProblemType.CHOOSE_MATCHING_EXPRESSION in self.problem_types:
+            super().generate_prompt(ProblemType.CHOOSE_MATCHING_EXPRESSION, **kwargs)
+        else:
+            raise ValueError("Invalid problem type")
