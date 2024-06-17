@@ -9,7 +9,7 @@ class DyckLanguageProblem(BaseProblem):
 
         self.parens: list[tuple[str, str]] = [("(", ")"), ("[", "]"), ("{", "}"), ("<", ">")]
 
-    def generate(self, min_length: int = 5, max_length: int = 10) -> None:
+    def generate(self, min_length: int = 5, max_length: int = 10, **kwargs) -> None:
         self.min_length: int = min_length
         self.max_length: int = max_length
         self.length: int = self.config.rng.randint(min_length, max_length)
@@ -42,16 +42,7 @@ class DyckLanguageProblem(BaseProblem):
 
 
 class DyckLanguageResponseProblem(DyckLanguageProblem, ResponseProblem):
-    def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
-        examples = []
-        for i in range(num_shots):
-            self.config.increment_seed()
-            example_problem = DyckLanguageResponseProblem(config=self.config)
-            example_problem.generate(min_length=self.length, max_length=self.length)
-            example_problem.generate_prompt(num_shots=0)
-            examples.append(example_problem)
-
-        return examples
+    pass
 
 
 class DyckLanguageMultipleChoiceProblem(DyckLanguageProblem, MultipleChoiceProblem):

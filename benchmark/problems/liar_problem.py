@@ -17,7 +17,7 @@ class LiarProblem(BaseProblem):
         self.final_truth: bool = False
         self.statement_style: bool = False
         
-    def generate(self, num_people: int = 5) -> None:
+    def generate(self, num_people: int = 5, **kwargs) -> None:
         self.num_people = num_people
         self.names = self.config.rng.sample(self.names, num_people)
         self.truthfulness = {name: self.config.rng.choice([True, False]) for name in self.names}
@@ -61,16 +61,8 @@ class LiarProblem(BaseProblem):
 
 
 class LiarResponseProblem(LiarProblem, ResponseProblem):
-    def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
-        examples = []
-        for i in range(num_shots):
-            self.config.increment_seed()
-            example_problem = LiarResponseProblem(config=self.config)
-            example_problem.generate(num_people=self.num_people)
-            example_problem.generate_prompt(num_shots=0)
-            examples.append(example_problem)
+    pass
 
-        return examples
 
 class LiarMultipleChoiceProblem(LiarProblem, MultipleChoiceProblem):
     def generate_prompt(

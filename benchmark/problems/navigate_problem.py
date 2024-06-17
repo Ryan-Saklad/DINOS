@@ -7,7 +7,7 @@ class NavigateProblem(BaseProblem):
         self.problem_name: str = "navigate_problem"
         super().__init__(**kwargs)
 
-    def generate(self, min_num_steps: int = 5, max_num_steps: int = 7, min_distance: int = 1, max_distance: int = 10) -> None:
+    def generate(self, min_num_steps: int = 5, max_num_steps: int = 7, min_distance: int = 1, max_distance: int = 10, **kwargs) -> None:
         directions = ["forward", "left", "right", "backward"]
         turns = ["left", "right", "around"]
         actions = []
@@ -68,16 +68,7 @@ class NavigateProblem(BaseProblem):
 
 
 class NavigateResponseProblem(NavigateProblem, ResponseProblem):
-    def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
-        examples = []
-        for i in range(num_shots):
-            self.config.increment_seed()
-            example_problem = NavigateResponseProblem(config=self.config)
-            example_problem.generate(min_num_steps=self.num_steps, max_num_steps=self.num_steps, min_distance=self.min_distance, max_distance=self.max_distance)
-            example_problem.generate_prompt(num_shots=0)
-            examples.append(example_problem)
-
-        return examples
+    pass
 
 
 class NavigateMultipleChoiceProblem(NavigateProblem, MultipleChoiceProblem):

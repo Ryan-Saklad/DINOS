@@ -54,19 +54,19 @@ class ResponseProblem(BaseProblem, ABC):
 
         self.problem_types.append(ProblemType.RESPONSE)
 
-    def _generate_examples(self, num_shots: int, **kwargs) -> list['ResponseProblem']:
+    def generate_prompt(self, num_shots: int = 0) -> None:
+        self.prompt: str = self.render_template(examples=self._generate_examples(num_shots))
+
+    def _generate_examples(self, num_shots: int) -> list['ResponseProblem']:
         examples = []
         for i in range(num_shots):
             self.config.increment_seed()
             # Create an instance of the subclass from which this method is called
-            example_problem = type(self)(config=self.config, **kwargs)
-            example_problem.generate()
+            example_problem = type(self)(config=self.config)
+            example_problem.generate(**vars(self))
             example_problem.generate_prompt(num_shots=0)
             examples.append(example_problem)
         return examples
-
-    def generate_prompt(self, num_shots: int = 0) -> None:
-        self.prompt: str = self.render_template(examples=self._generate_examples(num_shots))
 
 class MultipleChoiceProblem(BaseProblem, ABC):
     def __init__(self, config: Config) -> None:

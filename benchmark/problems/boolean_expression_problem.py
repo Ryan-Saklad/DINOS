@@ -11,7 +11,7 @@ class BooleanExpressionProblem(BaseProblem):
         self.operators: list[str] = ["and", "or"]
         self.unary_operator: str = "not"
 
-    def generate(self, min_depth: int = 3, max_depth: int = 4) -> None:
+    def generate(self, min_depth: int = 3, max_depth: int = 4, **kwargs) -> None:
         if not isinstance(min_depth, int) or not isinstance(max_depth, int):
             raise ValueError("min_depth and max_depth must be integers")
         if min_depth < 1 or max_depth < min_depth:
@@ -44,16 +44,7 @@ class BooleanExpressionProblem(BaseProblem):
 
 
 class BooleanExpressionResponseProblem(BooleanExpressionProblem, ResponseProblem):
-    def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
-        examples = []
-        for i in range(num_shots):
-            self.config.increment_seed()
-            example_problem = BooleanExpressionResponseProblem(config=self.config)
-            example_problem.generate(min_depth=self.depth, max_depth=self.depth)
-            example_problem.generate_prompt(num_shots=0)
-            examples.append(example_problem)
-
-        return examples
+    pass
 
 
 class BooleanExpressionMultipleChoiceProblem(BooleanExpressionProblem, MultipleChoiceProblem):

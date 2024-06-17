@@ -9,7 +9,7 @@ class MathExpressionProblem(BaseProblem):
 
         self.operators: list[str] = ["+", "-", "*"]
 
-    def generate(self, min_depth: int = 2, max_depth: int = 3, min_value: int = -9, max_value: int = 9, min_sub_expressions: int = 2, max_sub_expressions: int = 4) -> None:
+    def generate(self, min_depth: int = 2, max_depth: int = 3, min_value: int = -9, max_value: int = 9, min_sub_expressions: int = 2, max_sub_expressions: int = 4, **kwargs) -> None:
         def generate_expression(depth: int, num_sub_expressions: int = 2) -> str:
             if depth == 1:
                 return str(self.config.rng.randint(min_value, max_value))
@@ -39,23 +39,7 @@ class MathExpressionProblem(BaseProblem):
 
 
 class MathExpressionResponseProblem(MathExpressionProblem, ResponseProblem):
-    def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
-        examples = []
-        for i in range(num_shots):
-            self.config.increment_seed()
-            example_problem = MathExpressionResponseProblem(config=self.config)
-            example_problem.generate(
-                min_depth=self.min_depth,
-                max_depth=self.max_depth,
-                min_value=self.min_value,
-                max_value=self.max_value,
-                min_sub_expressions=self.min_sub_expressions,
-                max_sub_expressions=self.max_sub_expressions
-            )
-            example_problem.generate_prompt(num_shots=0)
-            examples.append(example_problem)
-
-        return examples
+    pass
 
 
 class MathExpressionMultipleChoiceProblem(MathExpressionProblem, MultipleChoiceProblem):
