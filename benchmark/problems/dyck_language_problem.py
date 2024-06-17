@@ -1,4 +1,6 @@
 from benchmark.problems.problem import BaseProblem, ResponseProblem, MultipleChoiceProblem
+from utils.problem_type import ProblemType
+
 
 class DyckLanguageProblem(BaseProblem):
     def __init__(self, **kwargs) -> None:
@@ -82,6 +84,8 @@ class DyckLanguageMultipleChoiceProblem(DyckLanguageProblem, MultipleChoiceProbl
         self.answer = correct_label
         self.options = dict(option_pairs)
         self.option_labels = option_labels
+
+        self.problem_types.append(ProblemType.SOLVE_EXPRESSION)
 
         self.prompt = self.render_template(examples=self._generate_examples(num_shots))
 

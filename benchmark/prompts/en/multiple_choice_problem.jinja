@@ -3,7 +3,7 @@
 {% if ProblemType.CHOOSE_MATCHING_EXPRESSION in Problem.problem_types %}
 {{ example.answer }}
 {% elif ProblemType.SOLVE_EXPRESSION in Problem.problem_types %}
-{{ example.problem }}
+{{ example.answer }}
 {% endif %}
 {% endfor %}
 {% include "multiple_choice_format.jinja" with context %}
