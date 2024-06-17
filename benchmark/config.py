@@ -39,9 +39,9 @@ class Config:
                     continue
             raise ValueError(f"Template '{template_name}' not found in any of the specified languages or fallback language '{self.fallback_language}'")
 
-    def render_template(self, problem: "BaseProblem") -> str:
+    def render_template(self, problem: "BaseProblem", examples: list["BaseProblem"] | None = None, **kwargs) -> str:
         template = self.get_template(problem.problem_name + ".jinja")
-        rendered_template = template.render(Problem=problem, ProblemType=ProblemType)
+        rendered_template = template.render(Problem=problem, ProblemType=ProblemType, examples=examples, **kwargs)
         
         return rendered_template.strip()
 

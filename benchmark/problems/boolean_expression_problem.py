@@ -38,19 +38,18 @@ class BooleanExpressionProblem(BaseProblem):
         self._answer: str = self._evaluate(self.problem)
         self.answer: str = self._answer
 
-        self.prompt: str = self.render_template()
-
     def _evaluate(self, expression: str) -> str:
         return str(eval(expression))
 
 
 class BooleanExpressionResponseProblem(BooleanExpressionProblem, ResponseProblem):
     def generate_prompt(self, num_shots: int = 0) -> None:
-        self.prompt: str = self.render_template()
+        self.prompt: str = self.render_template(examples=self._generate_examples(num_shots))
 
     def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
         examples = []
         for i in range(num_shots):
+            self.config.increment_seed()
             example_problem = BooleanExpressionResponseProblem(config=self.config)
             example_problem.generate(min_depth=self.depth, max_depth=self.depth)
             example_problem.generate_prompt(num_shots=0)
@@ -87,7 +86,7 @@ class BooleanExpressionMultipleChoiceProblem(BooleanExpressionProblem, MultipleC
         self.options = dict(option_pairs)
         self.option_labels = option_labels
 
-        self.prompt = self.render_template()
+        self.prompt = self.render_template(examples=self._generate_examples(num_shots))
 
     def _create_additional_choices(self, option_labels: list[str], num_options: int) -> tuple[list[tuple[str, ResponseProblem]], str, int]:
         option_pairs: list[tuple[str, ResponseProblem]] = [(label, None) for label in option_labels]
@@ -113,3 +112,14 @@ class BooleanExpressionMultipleChoiceProblem(BooleanExpressionProblem, MultipleC
                 option_pairs[i] = (label, problems.pop(0))
 
         return option_pairs, correct_label
+
+    def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
+        examples = []
+        for i in range(num_shots):
+            self.config.increment_seed()
+            example_problem = BooleanExpressionMultipleChoiceProblem(config=self.config)
+            example_problem.generate(min_depth=self.depth, max_depth=self.depth)
+            example_problem.generate_prompt(num_shots=0)
+            examples.append(example_problem)
+
+        return examples

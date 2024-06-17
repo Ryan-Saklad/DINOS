@@ -1,4 +1,4 @@
-{{ problem if problem is defined else Problem.problem }}
+{{ instruction }}
 
 Options:
 {% for label in Problem.option_labels %}{{label}}. {{Problem.options[label].problem}}

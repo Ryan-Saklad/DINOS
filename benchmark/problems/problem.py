@@ -16,8 +16,8 @@ class BaseProblem(ABC):
         self.problem_types: list[ProblemType] = []
         self.seed: int = config.seed
 
-    def render_template(self, **kwargs) -> str:
-        return self.config.render_template(self)
+    def render_template(self, examples: list["BaseProblem"] | None = None, **kwargs) -> str:
+        return self.config.render_template(self, examples, **kwargs)
 
     @abstractmethod
     def generate(self) -> None:

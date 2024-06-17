@@ -12,7 +12,7 @@ from benchmark.problems.boolean_expression_problem import BooleanExpressionRespo
 from benchmark.problems.dyck_language_problem import DyckLanguageResponseProblem, DyckLanguageMultipleChoiceProblem
 from benchmark.problems.liar_problem import LiarResponseProblem, LiarMultipleChoiceProblem
 from benchmark.problems.math_expression_problem import MathExpressionResponseProblem, MathExpressionMultipleChoiceProblem
-from benchmark.problems.navigate_problem import NavigateResponseProblem, NavigateMultipleChoiceProblem
+# from benchmark.problems.navigate_problem import NavigateResponseProblem, NavigateMultipleChoiceProblem
 
 problem_classes: list = [
     BooleanExpressionResponseProblem, 

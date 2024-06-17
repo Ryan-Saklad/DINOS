@@ -1,5 +1,65 @@
 from benchmark.problems.problem import BaseProblem, ResponseProblem, MultipleChoiceProblem
 
+
+class NavigateProblem(BaseProblem):
+    def __init__(self, **kwargs) -> None:
+        self.problem_name: str = "navigate_problem"
+        super().__init__(**kwargs)
+
+    def generate(self, min_num_steps: int = 5, max_num_steps: int = 7, min_distance: int = 1, max_distance: int = 10) -> None:
+        directions = ["forward", "left", "right", "backward"]
+        turns = ["left", "right", "around"]
+        actions = []
+
+        x, y = 0, 0  # Starting position
+        facing = 0  # 0: North, 1: East, 2: South, 3: West
+
+        for _ in range(num_steps):
+            action_type = self.config.rng.choice(["move", "turn"])
+
+            if action_type == "move":
+                direction = self.config.rng.choice(directions)
+                steps = self.config.rng.randint(min_distance, max_distance)
+                action = f"Take {steps} step{'s' if steps > 1 else ''} {direction}."
+                actions.append(action)
+
+                if direction == "forward":
+                    if facing == 0: y += steps
+                    elif facing == 1: x += steps 
+                    elif facing == 2: y -= steps
+                    elif facing == 3: x -= steps
+                elif direction == "backward":
+                    if facing == 0: y -= steps
+                    elif facing == 1: x -= steps
+                    elif facing == 2: y += steps
+                    elif facing == 3: x += steps
+                elif direction == "left":
+                    if facing == 0: x -= steps
+                    elif facing == 1: y += steps
+                    elif facing == 2: x += steps
+                    elif facing == 3: y -= steps
+                elif direction == "right":
+                    if facing == 0: x += steps
+                    elif facing == 1: y -= steps
+                    elif facing == 2: x -= steps
+                    elif facing == 3: y += steps
+            else:
+                turn = self.config.rng.choice(turns)
+                action = f"Turn {turn}."
+                actions.append(action)
+
+                if turn == "left":
+                    facing = (facing - 1) % 4
+                elif turn == "right":
+                    facing = (facing + 1) % 4
+                elif turn == "around":
+                    facing = (facing + 2) % 4
+
+        self.problem: str = " ".join(actions)
+        self._answer: str = f"({x}, {y})"
+        self.answer: str = self.answer
+
+"""
 class NavigateProblem(BaseProblem):
     def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
         super().__init__(seed)
@@ -219,3 +279,4 @@ class NavigateMultipleChoiceProblem(NavigateProblem, MultipleChoiceProblem):
         
         if len(examples) > 0:
             self.prompt = f"{examples_str}\n\n{self.prompt}"
+"""
