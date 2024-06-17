@@ -110,7 +110,6 @@ class MultipleChoiceProblem(BaseProblem, ABC):
 
         return options[:num_options]
 
-    @abstractmethod
     def generate_prompt(
         self, 
         num_shots: int = 0, 
@@ -121,7 +120,37 @@ class MultipleChoiceProblem(BaseProblem, ABC):
         prevent_same_letter_case: bool = False, 
         randomize: bool = False
     ) -> None:
-        raise NotImplementedError
+        option_labels = self._generate_option_labels(
+            num_options, 
+            use_uppercase, 
+            use_lowercase, 
+            use_numbers, 
+            prevent_same_letter_case, 
+            randomize
+        )
+
+        option_pairs: list[tuple[str, ResponseProblem]]
+        correct_label: str
+
+        option_pairs, correct_label = self._create_additional_choices(option_labels, num_options)
+        self.answer = correct_label
+        self.options = dict(option_pairs)
+        self.option_labels = option_labels
+
+        self.prompt = self.render_template(examples=self._generate_examples(num_shots))
+
+    def _generate_examples(self, num_shots: int) -> list[BaseProblem]:
+        examples = []
+        for i in range(num_shots):
+            self.config.increment_seed()
+            # Create an instance of the subclass from which this method is called
+            example_problem = type(self)(config=self.config)
+            example_problem.problem_types = self.problem_types  # Guarentees the correct type of problem is created
+            example_problem.generate(**vars(self))
+            example_problem.generate_prompt(num_shots=0)
+            examples.append(example_problem)
+
+        return examples
 
     def generate_problem_json(self, problem_id: int | None = None) -> dict:
         problem_json = super().generate_problem_json(problem_id)

@@ -112,22 +112,3 @@ class MathExpressionMultipleChoiceProblem(MathExpressionProblem, MultipleChoiceP
                 option_pairs[i] = (label, problems.pop(0))
 
         return option_pairs, correct_label
-
-    def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
-        examples = []
-        for i in range(num_shots):
-            self.config.increment_seed()
-            example_problem = MathExpressionMultipleChoiceProblem(config=self.config)
-            example_problem.problem_types = self.problem_types  # Guarentees the correct type of problem is created
-            example_problem.generate(
-                min_depth=self.min_depth,
-                max_depth=self.max_depth,
-                min_value=self.min_value,
-                max_value=self.max_value,
-                min_sub_expressions=self.min_sub_expressions,
-                max_sub_expressions=self.max_sub_expressions
-            )
-            example_problem.generate_prompt(num_shots=0)
-            examples.append(example_problem)
-
-        return examples

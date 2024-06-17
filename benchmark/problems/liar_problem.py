@@ -65,36 +65,10 @@ class LiarResponseProblem(LiarProblem, ResponseProblem):
 
 
 class LiarMultipleChoiceProblem(LiarProblem, MultipleChoiceProblem):
-    def generate_prompt(
-        self, 
-        num_shots: int = 0, 
-        num_options: int = 2,
-        use_uppercase: bool = True, 
-        use_lowercase: bool = False, 
-        use_numbers: bool = False, 
-        prevent_same_letter_case: bool = False, 
-        randomize: bool = False
-    ) -> None:
-        option_labels = self._generate_option_labels(
-            num_options, 
-            use_uppercase, 
-            use_lowercase, 
-            use_numbers, 
-            prevent_same_letter_case, 
-            randomize
-        )
-
-        option_pairs: list[tuple[str, ResponseProblem]]
-        correct_label: str
-
-        option_pairs, correct_label = self._create_additional_choices(option_labels, num_options)
-        self.answer = correct_label
-        self.options = dict(option_pairs)
-        self.option_labels = option_labels
-
-        self.problem_types.append(ProblemType.CHOOSE_MATCHING_EXPRESSION)
-
-        self.prompt = self.render_template(examples=self._generate_examples(num_shots))
+    def generate_prompt(self, **kwargs) -> None:
+        if ProblemType.CHOOSE_MATCHING_EXPRESSION not in self.problem_types:
+            self.problem_types.append(ProblemType.CHOOSE_MATCHING_EXPRESSION)
+        super().generate_prompt(**kwargs)
 
     def _create_additional_choices(self, option_labels: list[str], num_options: int) -> tuple[list[tuple[str, ResponseProblem]], str, int]:
         option_pairs: list[tuple[str, ResponseProblem]] = [(label, None) for label in option_labels]
@@ -121,15 +95,3 @@ class LiarMultipleChoiceProblem(LiarProblem, MultipleChoiceProblem):
                 option_pairs[i] = (label, problems.pop(0))
 
         return option_pairs, correct_label
-
-    
-    def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
-        examples = []
-        for i in range(num_shots):
-            self.config.increment_seed()
-            example_problem = LiarMultipleChoiceProblem(config=self.config)
-            example_problem.generate(num_people=self.num_people)
-            example_problem.generate_prompt(num_shots=0)
-            examples.append(example_problem)
-
-        return examples
