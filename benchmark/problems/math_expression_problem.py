@@ -35,13 +35,10 @@ class MathExpressionProblem(BaseProblem):
         
         self.problem = generate_expression(depth, num_sub_expressions)
         self._answer = str(eval(self.problem))
-        self.answer = self._answer
+        self.answer: str = self._answer
 
 
 class MathExpressionResponseProblem(MathExpressionProblem, ResponseProblem):
-    def generate_prompt(self, num_shots: int = 0) -> None:
-        self.prompt: str = self.render_template(examples=self._generate_examples(num_shots))
-
     def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
         examples = []
         for i in range(num_shots):

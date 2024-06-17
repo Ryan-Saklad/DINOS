@@ -15,16 +15,16 @@ from benchmark.problems.math_expression_problem import MathExpressionResponsePro
 from benchmark.problems.navigate_problem import NavigateResponseProblem, NavigateMultipleChoiceProblem
 
 problem_classes: list = [
-    # BooleanExpressionResponseProblem, 
-    # BooleanExpressionMultipleChoiceProblem, 
-    # DyckLanguageResponseProblem, 
-    # DyckLanguageMultipleChoiceProblem, 
-    # LiarResponseProblem, 
-    # LiarMultipleChoiceProblem, 
+    BooleanExpressionResponseProblem, 
+    BooleanExpressionMultipleChoiceProblem, 
+    DyckLanguageResponseProblem, 
+    DyckLanguageMultipleChoiceProblem, 
+    LiarResponseProblem, 
+    LiarMultipleChoiceProblem, 
     MathExpressionResponseProblem, 
     MathExpressionMultipleChoiceProblem, 
-    # NavigateResponseProblem, 
-    # NavigateMultipleChoiceProblem
+    NavigateResponseProblem, 
+    NavigateMultipleChoiceProblem
 ]
 
 def generate_benchmark(seed: int | None = None, num_problems: int = 1000, max_problem_types: int = None, num_shots: int = 0) -> dict[str, dict]:

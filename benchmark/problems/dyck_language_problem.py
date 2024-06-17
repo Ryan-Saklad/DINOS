@@ -38,13 +38,10 @@ class DyckLanguageProblem(BaseProblem):
 
         self.problem = dyck_word[:random_split_index]
         self._answer = dyck_word[random_split_index:]
-        self.answer = self._answer
+        self.answer: str = self._answer
 
 
 class DyckLanguageResponseProblem(DyckLanguageProblem, ResponseProblem):
-    def generate_prompt(self, num_shots: int = 0) -> None:
-        self.prompt: str = self.render_template(examples=self._generate_examples(num_shots))
-
     def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
         examples = []
         for i in range(num_shots):
