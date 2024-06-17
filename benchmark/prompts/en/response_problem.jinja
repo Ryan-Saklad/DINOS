@@ -1,0 +1,7 @@
+{% for example in examples %}
+{{ example.prompt }}
+
+{{ example.answer }}
+{% endfor %}
+{{ instruction }}
+{{ problem if problem is defined else Problem.problem }}

@@ -1,191 +1,149 @@
 from benchmark.problems.problem import BaseProblem, ResponseProblem, MultipleChoiceProblem
+from utils.problem_type import ProblemType
+
 
 class MathExpressionProblem(BaseProblem):
-    def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
-        super().__init__(seed)
-
+    def __init__(self, **kwargs) -> None:
         self.problem_name: str = "math_expression_problem"
-
-        if not prompts:
-            import json
-
-            with open("benchmark/prompts/en/math_expression_problem_prompts.json", "r") as f:
-                prompts = json.load(f)
-        
-        self.problem_prompt: str = prompts["response_prompt"]
-        self.multiple_choice_prompt: str = prompts["multiple_choice_prompt"]
+        super().__init__(**kwargs)
 
         self.operators: list[str] = ["+", "-", "*"]
-        
+
     def generate(self, min_depth: int = 2, max_depth: int = 3, min_value: int = -9, max_value: int = 9, min_sub_expressions: int = 2, max_sub_expressions: int = 4) -> None:
         def generate_expression(depth: int, num_sub_expressions: int = 2) -> str:
             if depth == 1:
-                return str(self.rng.randint(min_value, max_value))
+                return str(self.config.rng.randint(min_value, max_value))
             else:
-                sub_expressions = [generate_expression(depth - 1, self.rng.randint(min_sub_expressions, max_sub_expressions)) for _ in range(num_sub_expressions)]
-                generated_operators = [self.rng.choice(self.operators) for _ in range(num_sub_expressions - 1)]
+                sub_expressions = [generate_expression(depth - 1, self.config.rng.randint(min_sub_expressions, max_sub_expressions)) for _ in range(num_sub_expressions)]
+                generated_operators = [self.config.rng.choice(self.operators) for _ in range(num_sub_expressions - 1)]
                 
                 expression = sub_expressions[0]
                 for i in range(num_sub_expressions - 1):
                     expression += f" {generated_operators[i]} {sub_expressions[i + 1]}"
                 
                 return f"({expression})"
+
+        self.min_depth: int = min_depth
+        self.max_depth: int = max_depth
+        self.min_value: int = min_value
+        self.max_value: int = max_value
+        self.min_sub_expressions: int = min_sub_expressions
+        self.max_sub_expressions: int = max_sub_expressions
         
-        depth: int = self.rng.randint(min_depth, max_depth)
-        num_sub_expressions: int = self.rng.randint(min_sub_expressions, max_sub_expressions)
+        depth: int = self.config.rng.randint(min_depth, max_depth)
+        num_sub_expressions: int = self.config.rng.randint(min_sub_expressions, max_sub_expressions)
         
         self.problem = generate_expression(depth, num_sub_expressions)
-        self.answer = str(eval(self.problem))
-        self.correct_answer = self.answer
+        self._answer = str(eval(self.problem))
+        self.answer: str = self._answer
+
 
 class MathExpressionResponseProblem(MathExpressionProblem, ResponseProblem):
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
-        
-    def generate_prompt(self, num_shots: int = 0) -> None:
-        self.prompt = f"{self.problem_prompt}\n\n{self.problem}"
-        
+    def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
         examples = []
         for i in range(num_shots):
-            example_problem = MathExpressionResponseProblem(seed=self.seed+i)
-            example_problem.generate()
+            self.config.increment_seed()
+            example_problem = MathExpressionResponseProblem(config=self.config)
+            example_problem.generate(
+                min_depth=self.min_depth,
+                max_depth=self.max_depth,
+                min_value=self.min_value,
+                max_value=self.max_value,
+                min_sub_expressions=self.min_sub_expressions,
+                max_sub_expressions=self.max_sub_expressions
+            )
             example_problem.generate_prompt(num_shots=0)
-            examples.append(f"{example_problem.prompt}\n{example_problem.answer}")
-        
-        examples_str = "\n\n".join(examples)
-        
-        if len(examples) > 0:
-            self.prompt = f"{examples_str}\n\n{self.prompt}"
+            examples.append(example_problem)
+
+        return examples
+
 
 class MathExpressionMultipleChoiceProblem(MathExpressionProblem, MultipleChoiceProblem):
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
-
     def generate_prompt(
-        self,
+        self, 
         num_shots: int = 0, 
         num_options: int = 2,
         use_uppercase: bool = True, 
         use_lowercase: bool = False, 
         use_numbers: bool = False, 
         prevent_same_letter_case: bool = False, 
-        randomize: bool = False,
-        include_evaluate_expression: bool = True, 
-        include_select_expression: bool = True
+        randomize: bool = False
     ) -> None:
-        if include_evaluate_expression and include_select_expression:
-            if self.rng.choice([True, False]):
-                self.generate_prompt_evaluate_expression(num_shots, num_options, use_uppercase, use_lowercase, use_numbers, prevent_same_letter_case, randomize)
+        option_labels = self._generate_option_labels(
+            num_options, 
+            use_uppercase, 
+            use_lowercase, 
+            use_numbers, 
+            prevent_same_letter_case, 
+            randomize
+        )
+
+        option_pairs: list[tuple[str, ResponseProblem]]
+        correct_label: str
+
+        option_pairs, correct_label = self._create_additional_choices(option_labels, num_options)
+        self.answer = correct_label
+        self.options = dict(option_pairs)
+        self.option_labels = option_labels
+
+        if ProblemType.SOLVE_EXPRESSION not in self.problem_types and ProblemType.CHOOSE_MATCHING_EXPRESSION not in self.problem_types:
+            if self.config.rng.choice([True, False]):
+                self.problem_types.append(ProblemType.SOLVE_EXPRESSION)
             else:
-                self.generate_prompt_select_expression(num_shots, num_options, use_uppercase, use_lowercase, use_numbers, prevent_same_letter_case, randomize)
-        elif include_evaluate_expression:
-            self.generate_prompt_evaluate_expression(num_shots, num_options, use_uppercase, use_lowercase, use_numbers, prevent_same_letter_case, randomize)
-        elif include_select_expression:
-            self.generate_prompt_select_expression(num_shots, num_options, use_uppercase, use_lowercase, use_numbers, prevent_same_letter_case, randomize)
-        else:
-            raise ValueError("At least one of include_evaluate_expression or include_select_expression must be True")
+                self.problem_types.append(ProblemType.CHOOSE_MATCHING_EXPRESSION)
+        # Otherwise, one of the two problem types is already set
 
-    def generate_prompt_evaluate_expression(
-        self, 
-        num_shots: int = 0, 
-        num_options: int = 2,
-        use_uppercase: bool = True, 
-        use_lowercase: bool = False, 
-        use_numbers: bool = False, 
-        prevent_same_letter_case: bool = False, 
-        randomize: bool = False
-    ) -> None:
-        option_labels = self._generate_option_labels(
-            num_options, 
-            use_uppercase, 
-            use_lowercase, 
-            use_numbers, 
-            prevent_same_letter_case, 
-            randomize
-        )
-        
-        values = [self.answer]
-        seed_increment: int = 1
+        self.prompt = self.render_template(examples=self._generate_examples(num_shots))
 
-        while len(values) < num_options:
-            new_problem = MathExpressionResponseProblem(seed=self.seed+seed_increment)
-            new_problem.generate()
-            seed_increment += 1
+    def _create_additional_choices(self, option_labels: list[str], num_options: int) -> tuple[list[tuple[str, ResponseProblem]], str, int]:
+        option_pairs: list[tuple[str, ResponseProblem]] = [(label, None) for label in option_labels]
 
-            if new_problem.answer != self.answer and new_problem.answer not in values:
-                values.append(new_problem.answer)
+        # Set the correct answer to this problem to a random label
+        random_label = self.config.rng.choice([label for label, option in option_pairs if option is None])
+        for i, (label, option) in enumerate(option_pairs):
+            if label == random_label:
+                option_pairs[i] = (label, self)
+                correct_label = label
+                break
 
-        self.rng.shuffle(values)
-        self.options = dict(zip(option_labels, values))
-        self.option_labels = option_labels
-        
-        options_str = "\n".join([f"{label}. {option}" for label, option in zip(option_labels, values)])
-        self.prompt = f"{self.multiple_choice_prompt}\n\n{self.problem}\n\nOptions:\n{options_str}"
+        problems = []
+        while len(problems) < num_options - 1:
+            self.config.increment_seed()
+            new_problem = MathExpressionMultipleChoiceProblem(config=self.config)
+            new_problem.problem_types = self.problem_types  # Guarentees the correct type of problem is created
+            new_problem.generate(
+                min_depth=self.min_depth, 
+                max_depth=self.max_depth, 
+                min_value=self.min_value, 
+                max_value=self.max_value, 
+                min_sub_expressions=self.min_sub_expressions, 
+                max_sub_expressions=self.max_sub_expressions
+            )
 
-        correct_label = next(label for label, option in self.options.items() if option == self.answer)
-        self.correct_answer = correct_label
+            if new_problem._answer != self._answer and new_problem.problem not in [option.problem for label, option in option_pairs if option is not None]:
+                problems.append(new_problem)
 
+        for i, (label, option) in enumerate(option_pairs):
+            if option is None and problems:
+                option_pairs[i] = (label, problems.pop(0))
+
+        return option_pairs, correct_label
+
+    def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
         examples = []
         for i in range(num_shots):
-            example_problem = MathExpressionMultipleChoiceProblem(seed=self.seed + seed_increment + i)
-            example_problem.generate()
-            example_problem.generate_prompt_evaluate_expression(num_shots=0, num_options=num_options, use_uppercase=use_uppercase, use_lowercase=use_lowercase, use_numbers=use_numbers, prevent_same_letter_case=prevent_same_letter_case, randomize=randomize)
-            examples.append(f"{example_problem.prompt}\n{example_problem.correct_answer}")
-        
-        examples_str = "\n\n".join(examples)
-        
-        if len(examples) > 0:
-            self.prompt = f"{examples_str}\n\n{self.prompt}"
+            self.config.increment_seed()
+            example_problem = MathExpressionMultipleChoiceProblem(config=self.config)
+            example_problem.problem_types = self.problem_types  # Guarentees the correct type of problem is created
+            example_problem.generate(
+                min_depth=self.min_depth,
+                max_depth=self.max_depth,
+                min_value=self.min_value,
+                max_value=self.max_value,
+                min_sub_expressions=self.min_sub_expressions,
+                max_sub_expressions=self.max_sub_expressions
+            )
+            example_problem.generate_prompt(num_shots=0)
+            examples.append(example_problem)
 
-    def generate_prompt_select_expression(
-        self, 
-        num_shots: int = 0, 
-        num_options: int = 2,
-        use_uppercase: bool = True, 
-        use_lowercase: bool = False, 
-        use_numbers: bool = False, 
-        prevent_same_letter_case: bool = False, 
-        randomize: bool = False
-    ) -> None:
-        option_labels = self._generate_option_labels(
-            num_options, 
-            use_uppercase, 
-            use_lowercase, 
-            use_numbers, 
-            prevent_same_letter_case, 
-            randomize
-        )
-        
-        values = [self.problem]
-        seed_increment: int = 1
-
-        while len(values) < num_options:
-            new_problem = MathExpressionResponseProblem(seed=self.seed+seed_increment)
-            new_problem.generate()
-            seed_increment += 1
-
-            if new_problem.problem not in values and new_problem.answer != self.answer:
-                values.append(new_problem.problem)
-
-        self.rng.shuffle(values)
-        self.options = dict(zip(option_labels, values))
-        self.option_labels = option_labels
-
-        options_str = "\n".join([f"{label}. {option}" for label, option in zip(option_labels, values)])
-        self.prompt = f"Select the option that evaluates to {self.answer}. Respond only with the label corresponding to your choice.\n\nOptions:\n{options_str}"
-
-        correct_label = next(label for label, option in self.options.items() if option == self.problem)
-        self.correct_answer = correct_label
-
-        examples = []
-        for i in range(num_shots):
-            example_problem = MathExpressionMultipleChoiceProblem(seed=self.seed + seed_increment + i)
-            example_problem.generate()
-
-            example_problem.generate_prompt_select_expression(num_shots=0, num_options=num_options, use_uppercase=use_uppercase, use_lowercase=use_lowercase, use_numbers=use_numbers, prevent_same_letter_case=prevent_same_letter_case, randomize=randomize)
-            examples.append(f"{example_problem.prompt}\n{example_problem.correct_answer}")
-        
-        examples_str = "\n\n".join(examples)
-        
-        if len(examples) > 0:
-            self.prompt = f"{examples_str}\n\n{self.prompt}"
+        return examples

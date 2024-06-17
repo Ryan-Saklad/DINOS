@@ -1,5 +1,0 @@
-{
-    "problem_prompt": "Determine the truthfulness ('True' or 'False') of the last person based on the following statements:",
-    "multiple_choice_prompt_t": "Select the choice where the last person mentioned is telling the truth based on the following statements. Respond only with the label corresponding to your choice.",
-    "multiple_choice_prompt_f": "Select the choice where the last person mentioned is a liar based on the following statements. Respond only with the label corresponding to your choice."
-}

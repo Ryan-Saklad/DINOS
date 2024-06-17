@@ -1,31 +1,27 @@
 from benchmark.problems.problem import BaseProblem, ResponseProblem, MultipleChoiceProblem
+from utils.problem_type import ProblemType
+
 
 class DyckLanguageProblem(BaseProblem):
-    def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
-        super().__init__(seed)
-
+    def __init__(self, **kwargs) -> None:
         self.problem_name: str = "dyck_language_problem"
-
-        if not prompts:
-            import json
-
-            with open("benchmark/prompts/en/dyck_language_problem_prompts.json", "r") as f:
-                prompts = json.load(f)
+        super().__init__(**kwargs)
 
         self.parens: list[tuple[str, str]] = [("(", ")"), ("[", "]"), ("{", "}"), ("<", ">")]
 
-        self.problem_prompt: str = prompts["problem_prompt"]
-        self.multiple_choice_prompt: str = prompts["multiple_choice_prompt"]
-
     def generate(self, min_length: int = 5, max_length: int = 10) -> None:
+        self.min_length: int = min_length
+        self.max_length: int = max_length
+        self.length: int = self.config.rng.randint(min_length, max_length)
+
         def generate_dyck_word(length: int) -> str:
             if length == 0:
                 return ""
             else:
-                split = self.rng.randint(0, length - 1)
+                split = self.config.rng.randint(0, length - 1)
                 left = generate_dyck_word(split)
                 right = generate_dyck_word(length - split - 1)
-                paren = self.rng.choice(self.parens)
+                paren = self.config.rng.choice(self.parens)
                 return f"{paren[0]}{left}{right}{paren[1]}"
         
         def valid_split_index(dyck_word: str) -> int:
@@ -35,39 +31,30 @@ class DyckLanguageProblem(BaseProblem):
                     last_start_index = i
             return last_start_index + 1 if last_start_index != -1 else len(dyck_word) // 2
 
-        length: int = self.rng.randint(min_length, max_length)
-        dyck_word = generate_dyck_word(length // 2 * 2)  # Ensure even length
+        dyck_word = generate_dyck_word(self.length // 2 * 2)  # Ensure even length
 
         split_index = valid_split_index(dyck_word)
-        random_split_index = self.rng.randint(split_index, len(dyck_word) - 1)
-        self.problem = dyck_word[:random_split_index]
-        self.answer = dyck_word[random_split_index:]
+        random_split_index = self.config.rng.randint(split_index, len(dyck_word) - 1)
 
-        self.correct_answer: str = self.answer
+        self.problem = dyck_word[:random_split_index]
+        self._answer = dyck_word[random_split_index:]
+        self.answer: str = self._answer
+
 
 class DyckLanguageResponseProblem(DyckLanguageProblem, ResponseProblem):
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
-    
-    def generate_prompt(self, num_shots: int = 0) -> None:
-        self.prompt = f"{self.problem_prompt}\n\n{self.problem}"
-
+    def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
         examples = []
         for i in range(num_shots):
-            example_problem = DyckLanguageResponseProblem(seed=self.seed+i)
-            example_problem.generate()
+            self.config.increment_seed()
+            example_problem = DyckLanguageResponseProblem(config=self.config)
+            example_problem.generate(min_length=self.length, max_length=self.length)
             example_problem.generate_prompt(num_shots=0)
-            examples.append(f"{example_problem.prompt}\n{example_problem.answer}")
-        
-        examples_str = "\n\n".join(examples)
-        
-        if len(examples) > 0:
-            self.prompt = f"{examples_str}\n\n{self.prompt}"
+            examples.append(example_problem)
+
+        return examples
+
 
 class DyckLanguageMultipleChoiceProblem(DyckLanguageProblem, MultipleChoiceProblem):
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
-
     def generate_prompt(
         self, 
         num_shots: int = 0, 
@@ -86,46 +73,52 @@ class DyckLanguageMultipleChoiceProblem(DyckLanguageProblem, MultipleChoiceProbl
             prevent_same_letter_case, 
             randomize
         )
-        
-        values = [self.correct_answer]
-        seed_increment: int = 1
 
-        while len(values) < num_options:
-            new_problem = DyckLanguageResponseProblem(seed=self.seed+seed_increment)
-            new_problem.generate()
-            seed_increment += 1
+        option_pairs: list[tuple[str, ResponseProblem]]
+        correct_label: str
 
-            if new_problem.answer != self.answer and new_problem.answer not in values:
-                values.append(new_problem.answer)
-
-        self.rng.shuffle(values)
-
-        self.options = {label: value for label, value in zip(option_labels, values)}
+        option_pairs, correct_label = self._create_additional_choices(option_labels, num_options)
+        self.answer = correct_label
+        self.options = dict(option_pairs)
         self.option_labels = option_labels
 
-        options_str = "\n".join([f"{label}. {option}" for label, option in zip(option_labels, values)])
-        self.prompt = f"{self.multiple_choice_prompt}\n\n{self.problem}\n\nOptions:\n{options_str}"
+        self.problem_types.append(ProblemType.SOLVE_EXPRESSION)
 
-        # Find the label corresponding to the correct answer
-        correct_label = next(label for label, value in self.options.items() if value == self.correct_answer)
-        self.correct_answer = correct_label
+        self.prompt = self.render_template(examples=self._generate_examples(num_shots))
 
+    def _create_additional_choices(self, option_labels: list[str], num_options: int) -> tuple[list[tuple[str, ResponseProblem]], str, int]:
+        option_pairs: list[tuple[str, ResponseProblem]] = [(label, None) for label in option_labels]
+
+        # Set the correct answer to this problem to a random label
+        random_label = self.config.rng.choice([label for label, option in option_pairs if option is None])
+        for i, (label, option) in enumerate(option_pairs):
+            if label == random_label:
+                option_pairs[i] = (label, self)
+                correct_label = label
+                break
+
+        problems = []
+        while len(problems) < num_options - 1:
+            self.config.increment_seed()
+            new_problem = DyckLanguageResponseProblem(config=self.config)
+            new_problem.generate(min_length=self.length, max_length=self.length)
+
+            if new_problem._answer != self._answer and new_problem.problem not in [option.problem for label, option in option_pairs if option is not None]:
+                problems.append(new_problem)
+
+        for i, (label, option) in enumerate(option_pairs):
+            if option is None and problems:
+                option_pairs[i] = (label, problems.pop(0))
+
+        return option_pairs, correct_label
+
+    def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
         examples = []
         for i in range(num_shots):
-            example_problem = DyckLanguageMultipleChoiceProblem(seed=self.seed + seed_increment + i)
-            example_problem.generate()
-            example_problem.generate_prompt(
-                num_shots=0, 
-                num_options=num_options, 
-                use_uppercase=use_uppercase, 
-                use_lowercase=use_lowercase, 
-                use_numbers=use_numbers, 
-                prevent_same_letter_case=prevent_same_letter_case, 
-                randomize=randomize
-            )
-            examples.append(f"{example_problem.prompt}\n{example_problem.correct_answer}")
-        
-        examples_str = "\n\n".join(examples)
-        
-        if len(examples) > 0:
-            self.prompt = f"{examples_str}\n\n{self.prompt}"
+            self.config.increment_seed()
+            example_problem = DyckLanguageMultipleChoiceProblem(config=self.config)
+            example_problem.generate(min_length=self.length, max_length=self.length)
+            example_problem.generate_prompt(num_shots=0)
+            examples.append(example_problem)
+
+        return examples

@@ -1,23 +1,16 @@
 import json
 
 from benchmark.problems.problem import BaseProblem, ResponseProblem, MultipleChoiceProblem
+from utils.problem_type import ProblemType
+
 
 class LiarProblem(BaseProblem):
-    def __init__(self, seed: int | None = None, prompts: dict = None) -> None:
-        super().__init__(seed)
-
+    def __init__(self, **kwargs) -> None:
         self.problem_name: str = "liar_problem"
+        super().__init__(**kwargs)
 
         with open("utils/names.json") as f:
             self.names: list[str] = json.load(f)["names"]
-
-        if not prompts:
-            with open("benchmark/prompts/en/liar_problem_prompts.json", "r") as f:
-                prompts = json.load(f)
-        
-        self.problem_prompt: str = prompts["problem_prompt"]
-        self.multiple_choice_prompt_t: str = prompts["multiple_choice_prompt_t"]
-        self.multiple_choice_prompt_f: str = prompts["multiple_choice_prompt_f"]
 
         self.truthfulness: dict[str, bool] = {}
         self.statements: list[str] = []
@@ -26,11 +19,14 @@ class LiarProblem(BaseProblem):
         
     def generate(self, num_people: int = 5) -> None:
         self.num_people = num_people
-        self.names = self.rng.sample(self.names, num_people)
-        self.truthfulness = {name: self.rng.choice([True, False]) for name in self.names}
-        self.statement_style = self.rng.choice([True, False])
+        self.names = self.config.rng.sample(self.names, num_people)
+        self.truthfulness = {name: self.config.rng.choice([True, False]) for name in self.names}
+        self.statement_style = self.config.rng.choice([True, False])
         
-        self.statements.append(f"{self.names[0]} always {'tells the truth' if self.truthfulness[self.names[0]] else 'lies'}.")
+        if self.truthfulness[self.names[0]]:
+            self.statements.append(f"{self.names[0]} always tells the truth.")
+        else:
+            self.statements.append(f"{self.names[0]} always lies.")
         
         for i in range(1, num_people):
             previous_name = self.names[i - 1]
@@ -38,42 +34,45 @@ class LiarProblem(BaseProblem):
             
             if self.statement_style:  # Current about Previous
                 if self.truthfulness[current_name]:
-                    self.statements.append(f"{current_name} says {previous_name} {'tells the truth' if self.truthfulness[previous_name] else 'lies'}.")
+                    if self.truthfulness[previous_name]:
+                        self.statements.append(f"{current_name} says {previous_name} tells the truth.") 
+                    else:
+                        self.statements.append(f"{current_name} says {previous_name} lies.")
                 else:
-                    self.statements.append(f"{current_name} says {previous_name} {'tells the truth' if not self.truthfulness[previous_name] else 'lies'}.")
+                    if self.truthfulness[previous_name]:
+                        self.statements.append(f"{current_name} says {previous_name} lies.")
+                    else:
+                        self.statements.append(f"{current_name} says {previous_name} tells the truth.")
             else:  # Previous about Current
                 if self.truthfulness[previous_name]:
-                    self.statements.append(f"{previous_name} says {current_name} {'tells the truth' if self.truthfulness[current_name] else 'lies'}.")
+                    if self.truthfulness[current_name]:
+                        self.statements.append(f"{previous_name} says {current_name} tells the truth.")
+                    else:
+                        self.statements.append(f"{previous_name} says {current_name} lies.")
                 else:
-                    self.statements.append(f"{previous_name} says {current_name} {'tells the truth' if not self.truthfulness[current_name] else 'lies'}.")
-        
-        self.problem = " ".join(self.statements)
-        self.answer = str(self.truthfulness[self.names[-1]])
-        self.correct_answer = self.answer
+                    if self.truthfulness[current_name]:
+                        self.statements.append(f"{previous_name} says {current_name} tells the truth.")
+                    else:
+                        self.statements.append(f"{previous_name} says {current_name} lies.")
+
+        self.problem: str = " ".join(self.statements)
+        self._answer = str(self.truthfulness[self.names[-1]])
+        self.answer: str = self._answer
+
 
 class LiarResponseProblem(LiarProblem, ResponseProblem):
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
-        
-    def generate_prompt(self, num_shots: int = 0) -> None:
-        self.prompt = f"{self.problem_prompt}\n\n{self.problem}\n\nIs {self.names[-1]} telling the truth? Answer 'True' or 'False'."
-        
+    def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
         examples = []
         for i in range(num_shots):
-            example_problem = LiarResponseProblem(seed=self.seed+i)
-            example_problem.generate(self.num_people)
+            self.config.increment_seed()
+            example_problem = LiarResponseProblem(config=self.config)
+            example_problem.generate(num_people=self.num_people)
             example_problem.generate_prompt(num_shots=0)
-            examples.append(f"{example_problem.prompt}\n{example_problem.answer}")
-        
-        examples_str = "\n\n".join(examples)
-        
-        if len(examples) > 0:
-            self.prompt = f"{examples_str}\n\n{self.prompt}"
+            examples.append(example_problem)
+
+        return examples
 
 class LiarMultipleChoiceProblem(LiarProblem, MultipleChoiceProblem):
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
-
     def generate_prompt(
         self, 
         num_shots: int = 0, 
@@ -92,40 +91,53 @@ class LiarMultipleChoiceProblem(LiarProblem, MultipleChoiceProblem):
             prevent_same_letter_case, 
             randomize
         )
-        
-        values = [" ".join(self.statements)]
-        seed_increment: int = 1
 
-        while len(values) < num_options:
-            new_problem = LiarResponseProblem(seed=self.seed+seed_increment)
-            new_problem.generate(self.num_people)
-            seed_increment += 1
+        option_pairs: list[tuple[str, ResponseProblem]]
+        correct_label: str
 
-            if new_problem.answer != self.answer and new_problem.problem not in values:
-                values.append(new_problem.problem)
-
-        self.rng.shuffle(values)
-        self.options = dict(zip(option_labels, values))
+        option_pairs, correct_label = self._create_additional_choices(option_labels, num_options)
+        self.answer = correct_label
+        self.options = dict(option_pairs)
         self.option_labels = option_labels
 
-        options_str = "\n".join([f"{label}. {option}" for label, option in zip(option_labels, values)])
+        self.problem_types.append(ProblemType.CHOOSE_MATCHING_EXPRESSION)
 
-        correct_label = next(label for label, option in self.options.items() if option == self.problem)
-        self.correct_answer = correct_label
+        self.prompt = self.render_template(examples=self._generate_examples(num_shots))
 
-        if self.answer == "True":
-            self.prompt = f"{self.multiple_choice_prompt_t}\n\n{options_str}"
-        else:
-            self.prompt = f"{self.multiple_choice_prompt_f}\n\n{options_str}"
+    def _create_additional_choices(self, option_labels: list[str], num_options: int) -> tuple[list[tuple[str, ResponseProblem]], str, int]:
+        option_pairs: list[tuple[str, ResponseProblem]] = [(label, None) for label in option_labels]
 
+        # Set the correct answer to this problem to a random label
+        random_label = self.config.rng.choice([label for label, option in option_pairs if option is None])
+        for i, (label, option) in enumerate(option_pairs):
+            if label == random_label:
+                option_pairs[i] = (label, self)
+                correct_label = label
+                break
+
+        problems = []
+        while len(problems) < num_options - 1:
+            self.config.increment_seed()
+            new_problem = LiarResponseProblem(config=self.config)
+            new_problem.generate(num_people=self.num_people)
+
+            if new_problem._answer != self._answer and new_problem.problem not in [option.problem for label, option in option_pairs if option is not None]:
+                problems.append(new_problem)
+
+        for i, (label, option) in enumerate(option_pairs):
+            if option is None and problems:
+                option_pairs[i] = (label, problems.pop(0))
+
+        return option_pairs, correct_label
+
+    
+    def _generate_examples(self, num_shots: int) -> list[ResponseProblem]:
         examples = []
         for i in range(num_shots):
-            example_problem = LiarMultipleChoiceProblem(seed=self.seed + seed_increment + i)
-            example_problem.generate(self.num_people)
-            example_problem.generate_prompt(num_shots=0, num_options=num_options, use_uppercase=use_uppercase, use_lowercase=use_lowercase, use_numbers=use_numbers, prevent_same_letter_case=prevent_same_letter_case, randomize=randomize)
-            examples.append(f"{example_problem.prompt}\n{example_problem.correct_answer}")
-        
-        examples_str = "\n\n".join(examples)
-        
-        if len(examples) > 0:
-            self.prompt = f"{examples_str}\n\n{self.prompt}"
+            self.config.increment_seed()
+            example_problem = LiarMultipleChoiceProblem(config=self.config)
+            example_problem.generate(num_people=self.num_people)
+            example_problem.generate_prompt(num_shots=0)
+            examples.append(example_problem)
+
+        return examples

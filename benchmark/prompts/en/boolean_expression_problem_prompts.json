@@ -1,5 +1,0 @@
-{
-    "response_prompt": "Evaluate the provided boolean expression. Respond only with 'True' or 'False'.",
-    "multiple_choice_prompt_t": "Select the option that evaluates to True. Respond only with the label corresponding to your choice.",
-    "multiple_choice_prompt_f": "Select the option that evaluates to False. Respond only with the label corresponding to your choice."
-}

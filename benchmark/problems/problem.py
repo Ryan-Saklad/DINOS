@@ -3,16 +3,21 @@ import random
 import string
 
 from abc import ABC, abstractmethod
+from benchmark.config import Config
 from utils.problem_type import ProblemType
 
-class BaseProblem(ABC):
-    def __init__(self, seed: int | None = None) -> None:
-        super().__init__()
-        self.problem_types: list[ProblemType] = []
-        self.seed: int | None = seed if seed is not None else random.randint(0, 1000000)
-        self.rng: random.Random = random.Random(seed)
 
-        self.answer: str = ""
+class BaseProblem(ABC):
+    def __init__(self, config: Config) -> None:
+        super().__init__()
+
+        self.config: Config = config
+        self.config.increment_seed()  # Allows for example creation to work properly
+        self.problem_types: list[ProblemType] = []
+        self.seed: int = config.seed
+
+    def render_template(self, examples: list["BaseProblem"] | None = None, **kwargs) -> str:
+        return self.config.render_template(self, examples, **kwargs)
 
     @abstractmethod
     def generate(self) -> None:
@@ -20,19 +25,7 @@ class BaseProblem(ABC):
 
     @abstractmethod
     def generate_prompt(self, num_shots: int = 0) -> None:
-        """
-        Generates a prompt for the problem.
-
-        Args:
-            num_shots (int): The number of example problems to include in the prompt. Default is 0.
-        """
         raise NotImplementedError
-
-    def validate(self, response: str) -> bool:
-        return response == self.answer
-
-    def get_answer(self) -> str:
-        return self.answer
 
     def generate_problem_json(self, problem_id: int | None = None) -> dict:
         if problem_id is None:
@@ -54,16 +47,30 @@ class BaseProblem(ABC):
                 }
             }
 
+
 class ResponseProblem(BaseProblem, ABC):
-    def __init__(self, seed: int | None = None) -> None:
-        super().__init__(seed)
+    def __init__(self, config: Config) -> None:
+        super().__init__(config)
 
         self.problem_types.append(ProblemType.RESPONSE)
 
+    def _generate_examples(self, num_shots: int, **kwargs) -> list['ResponseProblem']:
+        examples = []
+        for i in range(num_shots):
+            self.config.increment_seed()
+            # Create an instance of the subclass from which this method is called
+            example_problem = type(self)(config=self.config, **kwargs)
+            example_problem.generate()
+            example_problem.generate_prompt(num_shots=0)
+            examples.append(example_problem)
+        return examples
+
+    def generate_prompt(self, num_shots: int = 0) -> None:
+        self.prompt: str = self.render_template(examples=self._generate_examples(num_shots))
 
 class MultipleChoiceProblem(BaseProblem, ABC):
-    def __init__(self, seed: int | None = None) -> None:
-        super().__init__(seed)
+    def __init__(self, config: Config) -> None:
+        super().__init__(config)
 
         self.options: dict[str, str] = {}
         self.problem_types.append(ProblemType.MULTIPLE_CHOICE)
@@ -77,20 +84,6 @@ class MultipleChoiceProblem(BaseProblem, ABC):
         prevent_same_letter_case: bool = False, 
         randomize: bool = False
     ) -> list[str]:
-        """
-        Generates a list of option labels for multiple choice questions.
-
-        Args:
-            num_options (int): The number of option labels to generate.
-            use_uppercase (bool): Whether to include uppercase letters. Default is True.
-            use_lowercase (bool): Whether to include lowercase letters. Default is False.
-            use_numbers (bool): Whether to include numbers. Default is False.
-            prevent_same_letter_case (bool): Whether to prevent both lowercase and uppercase of the same letter from appearing. Default is False.
-            randomize (bool): Whether to randomize the order of the option labels. Default is False.
-
-        Returns:
-            list[str]: A list of option labels.
-        """
         options = []
         if use_uppercase:
             options.extend(string.ascii_uppercase)
@@ -113,7 +106,7 @@ class MultipleChoiceProblem(BaseProblem, ABC):
             raise ValueError("Number of options requested exceeds the available unique labels.")
 
         if randomize:
-            self.rng.shuffle(options)
+            self.config.rng.shuffle(options)
 
         return options[:num_options]
 
@@ -134,6 +127,7 @@ class MultipleChoiceProblem(BaseProblem, ABC):
         problem_json = super().generate_problem_json(problem_id)
         problem_json.update({
             "options": self.options,
-            "answer": self.correct_answer  # Correct answer is used for the label of the correct option rather than the actual answer
+            "answer": self.answer
         })
+
         return problem_json
