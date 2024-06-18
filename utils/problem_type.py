@@ -1,5 +1,6 @@
 from enum import Enum, auto
 
+
 class ProblemType(Enum):
     MULTIPLE_CHOICE = "MULTIPLE_CHOICE"
     RESPONSE = "RESPONSE"
