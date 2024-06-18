@@ -86,6 +86,61 @@ class MultipleChoiceProblem(BaseProblem, ABC):
         self.problem_types.append(ProblemType.MULTIPLE_CHOICE)
         self.alternate_display_answers: dict[str, AlternativeAnswer] = {}
 
+    def generate_prompt(
+        self,
+        problem_types: list[ProblemType] | ProblemType,
+        num_shots: int = 0,
+        num_options: int = 4,
+        use_uppercase: bool = True,
+        use_lowercase: bool = False,
+        use_numbers: bool = False,
+        prevent_same_letter_case: bool = False,
+        randomize: bool = False,
+        no_other_answer_probability: float = 0.25
+    ) -> None:
+        if not 0.0 <= no_other_answer_probability <= 1.0:
+            raise ValueError("no_other_answer_probability must be between 0 and 1")
+
+        if isinstance(problem_types, ProblemType):
+            problem_types = [problem_types]
+
+        for problem_type in problem_types:
+            if problem_type not in self.problem_types:
+                self.problem_types.append(problem_type)
+
+        option_labels = self._generate_option_labels(
+            num_options, 
+            use_uppercase, 
+            use_lowercase, 
+            use_numbers, 
+            prevent_same_letter_case, 
+            randomize
+        )
+
+        if num_options > len(option_labels):
+            raise ValueError("Number of options requested exceeds the available unique labels.")
+
+        option_pairs: list[tuple[str, ResponseProblem]]
+        correct_label: str
+
+        option_pairs, correct_label = self._create_additional_choices(option_labels, num_options)
+
+        if self.config.rng.random() < no_other_answer_probability:
+            choice = self.config.rng.choice([1, 2, 3])
+            if choice == 1:
+                random_index = self.config.rng.randint(0, len(option_pairs) - 1)
+                self.alternate_display_answers[option_pairs[random_index][0]] = AlternativeAnswer.NONE_OF_THE_OTHER_ANSWERS
+            elif choice == 2:
+                self.alternate_display_answers[option_pairs[-1][0]] = AlternativeAnswer.NONE_OF_THE_ABOVE
+            elif choice == 3:
+                self.alternate_display_answers[option_pairs[0][0]] = AlternativeAnswer.NONE_OF_THE_BELOW
+
+        self.answer = correct_label
+        self.options = dict(option_pairs)
+        self.option_labels = option_labels
+
+        self.prompt = self.render_template(examples=self._generate_examples(num_shots))
+
     def _generate_option_labels(
         self, 
         num_options: int, 
@@ -120,58 +175,6 @@ class MultipleChoiceProblem(BaseProblem, ABC):
             self.config.rng.shuffle(options)
 
         return options[:num_options]
-
-    def generate_prompt(
-        self,
-        problem_types: list[ProblemType] | ProblemType,
-        num_shots: int = 0,
-        num_options: int = 4,
-        use_uppercase: bool = True,
-        use_lowercase: bool = False,
-        use_numbers: bool = False,
-        prevent_same_letter_case: bool = False,
-        randomize: bool = False,
-        no_other_answer_probability: float = 0.3
-    ) -> None:
-        if not 0.0 <= no_other_answer_probability <= 1.0:
-            raise ValueError("no_other_answer_probability must be between 0 and 1")
-
-        if isinstance(problem_types, ProblemType):
-            problem_types = [problem_types]
-
-        for problem_type in problem_types:
-            if problem_type not in self.problem_types:
-                self.problem_types.append(problem_type)
-
-        option_labels = self._generate_option_labels(
-            num_options, 
-            use_uppercase, 
-            use_lowercase, 
-            use_numbers, 
-            prevent_same_letter_case, 
-            randomize
-        )
-
-        option_pairs: list[tuple[str, ResponseProblem]]
-        correct_label: str
-
-        option_pairs, correct_label = self._create_additional_choices(option_labels, num_options)
-
-        if self.config.rng.random() < no_other_answer_probability:
-            choice = self.config.rng.choice([1, 2, 3])
-            if choice == 1:
-                random_index = self.config.rng.randint(0, len(option_pairs) - 1)
-                self.alternate_display_answers[option_pairs[random_index][0]] = AlternativeAnswer.NONE_OF_THE_OTHER_ANSWERS
-            elif choice == 2:
-                self.alternate_display_answers[option_pairs[-1][0]] = AlternativeAnswer.NONE_OF_THE_ABOVE
-            elif choice == 3:
-                self.alternate_display_answers[option_pairs[0][0]] = AlternativeAnswer.NONE_OF_THE_BELOW
-
-        self.answer = correct_label
-        self.options = dict(option_pairs)
-        self.option_labels = option_labels
-
-        self.prompt = self.render_template(examples=self._generate_examples(num_shots))
 
     def _create_additional_choices(self, option_labels: list[str], num_options: int) -> tuple[list[tuple[str, ResponseProblem]], str, int]:
         option_pairs: list[tuple[str, ResponseProblem]] = [(label, None) for label in option_labels]
