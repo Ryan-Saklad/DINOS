@@ -125,14 +125,17 @@ class MultipleChoiceProblem(BaseProblem, ABC):
         self,
         problem_types: list[ProblemType] | ProblemType,
         num_shots: int = 0,
-        num_options: int = 2,
+        num_options: int = 4,
         use_uppercase: bool = True,
         use_lowercase: bool = False,
         use_numbers: bool = False,
         prevent_same_letter_case: bool = False,
         randomize: bool = False,
-        none_of_the_other_answers: bool = True
+        no_other_answer_probability: float = 0.3
     ) -> None:
+        if not 0.0 <= no_other_answer_probability <= 1.0:
+            raise ValueError("no_other_answer_probability must be between 0 and 1")
+
         if isinstance(problem_types, ProblemType):
             problem_types = [problem_types]
 
@@ -154,15 +157,15 @@ class MultipleChoiceProblem(BaseProblem, ABC):
 
         option_pairs, correct_label = self._create_additional_choices(option_labels, num_options)
 
-        if none_of_the_other_answers:
+        if self.config.rng.random() < no_other_answer_probability:
             choice = self.config.rng.choice([1, 2, 3])
             if choice == 1:
                 random_index = self.config.rng.randint(0, len(option_pairs) - 1)
                 self.alternate_display_answers[option_pairs[random_index][0]] = AlternativeAnswer.NONE_OF_THE_OTHER_ANSWERS
             elif choice == 2:
-                self.alternate_display_answers[option_pairs[-1][0]] = AlternativeAnswer.NONE_OF_THE_OTHER_ANSWERS
+                self.alternate_display_answers[option_pairs[-1][0]] = AlternativeAnswer.NONE_OF_THE_ABOVE
             elif choice == 3:
-                self.alternate_display_answers[option_pairs[0][0]] = AlternativeAnswer.NONE_OF_THE_OTHER_ANSWERS
+                self.alternate_display_answers[option_pairs[0][0]] = AlternativeAnswer.NONE_OF_THE_BELOW
 
         self.answer = correct_label
         self.options = dict(option_pairs)
