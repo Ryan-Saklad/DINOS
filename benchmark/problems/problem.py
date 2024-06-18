@@ -4,6 +4,7 @@ import string
 
 from abc import ABC, abstractmethod
 from benchmark.config import Config
+from enum import Enum
 from utils.problem_type import ProblemType
 
 
@@ -71,12 +72,19 @@ class ResponseProblem(BaseProblem, ABC):
         self.prompt: str = self.render_template(examples=self._generate_examples(num_shots))
 
 
+class AlternativeAnswer(Enum):
+    NONE_OF_THE_ABOVE = "None of the above"
+    NONE_OF_THE_BELOW = "None of the below"
+    NONE_OF_THE_OTHER_ANSWERS = "None of the other answers"
+
+
 class MultipleChoiceProblem(BaseProblem, ABC):
     def __init__(self, config: Config) -> None:
         super().__init__(config)
 
         self.options: dict[str, str] = {}
         self.problem_types.append(ProblemType.MULTIPLE_CHOICE)
+        self.alternate_display_answers: dict[str, AlternativeAnswer] = {}
 
     def _generate_option_labels(
         self, 
@@ -122,7 +130,8 @@ class MultipleChoiceProblem(BaseProblem, ABC):
         use_lowercase: bool = False,
         use_numbers: bool = False,
         prevent_same_letter_case: bool = False,
-        randomize: bool = False
+        randomize: bool = False,
+        none_of_the_other_answers: bool = True
     ) -> None:
         if isinstance(problem_types, ProblemType):
             problem_types = [problem_types]
@@ -144,6 +153,17 @@ class MultipleChoiceProblem(BaseProblem, ABC):
         correct_label: str
 
         option_pairs, correct_label = self._create_additional_choices(option_labels, num_options)
+
+        if none_of_the_other_answers:
+            choice = self.config.rng.choice([1, 2, 3])
+            if choice == 1:
+                random_index = self.config.rng.randint(0, len(option_pairs) - 1)
+                self.alternate_display_answers[option_pairs[random_index][0]] = AlternativeAnswer.NONE_OF_THE_OTHER_ANSWERS
+            elif choice == 2:
+                self.alternate_display_answers[option_pairs[-1][0]] = AlternativeAnswer.NONE_OF_THE_OTHER_ANSWERS
+            elif choice == 3:
+                self.alternate_display_answers[option_pairs[0][0]] = AlternativeAnswer.NONE_OF_THE_OTHER_ANSWERS
+
         self.answer = correct_label
         self.options = dict(option_pairs)
         self.option_labels = option_labels
