@@ -14,20 +14,23 @@ from benchmark.problems.liar_problem import LiarResponseProblem, LiarMultipleCho
 from benchmark.problems.logical_deduction_n_people_problem import LogicalDeductionNPeopleResponseProblem, LogicalDeductionNPeopleMultipleChoiceProblem
 from benchmark.problems.math_expression_problem import MathExpressionResponseProblem, MathExpressionMultipleChoiceProblem
 from benchmark.problems.navigate_problem import NavigateResponseProblem, NavigateMultipleChoiceProblem
+from benchmark.problems.people_sorting_problem import PeopleSortingResponseProblem, PeopleSortingMultipleChoiceProblem
 
 problem_classes: list[BaseProblem] = [
-    BooleanExpressionResponseProblem, 
-    BooleanExpressionMultipleChoiceProblem, 
-    DyckLanguageResponseProblem, 
-    DyckLanguageMultipleChoiceProblem, 
-    LiarResponseProblem, 
-    LiarMultipleChoiceProblem, 
-    LogicalDeductionNPeopleResponseProblem,
-    LogicalDeductionNPeopleMultipleChoiceProblem,
-    MathExpressionResponseProblem, 
-    MathExpressionMultipleChoiceProblem, 
-    NavigateResponseProblem, 
-    NavigateMultipleChoiceProblem
+    # BooleanExpressionResponseProblem, 
+    # BooleanExpressionMultipleChoiceProblem, 
+    # DyckLanguageResponseProblem, 
+    # DyckLanguageMultipleChoiceProblem, 
+    # LiarResponseProblem, 
+    # LiarMultipleChoiceProblem, 
+    # LogicalDeductionNPeopleResponseProblem,
+    # LogicalDeductionNPeopleMultipleChoiceProblem,
+    # MathExpressionResponseProblem, 
+    # MathExpressionMultipleChoiceProblem, 
+    # NavigateResponseProblem, 
+    # NavigateMultipleChoiceProblem,
+    PeopleSortingResponseProblem,
+    PeopleSortingMultipleChoiceProblem
 ]
 
 def generate_benchmark(seed: int | None = None, num_problems: int = 1000, max_problem_types: int = None, num_shots: int = 0) -> dict[str, dict]:

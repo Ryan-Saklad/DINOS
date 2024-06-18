@@ -1,0 +1,9 @@
+{% if ProblemType.RESPONSE in Problem.problem_types %}
+{% set instruction = "Sort the following list alphabetically. Respond only with the people sorted, space separated." %}
+{% include "response_problem.jinja" with context %}
+{% elif ProblemType.MULTIPLE_CHOICE in Problem.problem_types %}
+{% if ProblemType.SOLVE_EXPRESSION in Problem.problem_types %}
+{% set instruction = "Sort the following list alphabetically.\n" ~ Problem.problem ~ "\nRespond only with the label corresponding to the properly sorted list." %}
+{% endif %}
+{% include "multiple_choice_problem.jinja" with context %}
+{% endif %}
