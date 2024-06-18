@@ -8,7 +8,7 @@ from utils.problem_type import ProblemType
 
 class LogicalDeductionNPeopleProblem(BaseProblem):
     def __init__(self, **kwargs) -> None:
-        self.problem_name: str = "logical_deduction_n_people"
+        self.problem_name: str = "logical_deduction_n_people_problem"
         super().__init__(**kwargs)
 
         with open("utils/names.json") as f:
