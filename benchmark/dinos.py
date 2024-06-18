@@ -11,20 +11,23 @@ from benchmark.config import Config
 from benchmark.problems.boolean_expression_problem import BooleanExpressionResponseProblem, BooleanExpressionMultipleChoiceProblem
 from benchmark.problems.dyck_language_problem import DyckLanguageResponseProblem, DyckLanguageMultipleChoiceProblem
 from benchmark.problems.liar_problem import LiarResponseProblem, LiarMultipleChoiceProblem
+from benchmark.problems.logical_deduction_n_people import LogicalDeductionNPeopleResponseProblem, LogicalDeductionNPeopleMultipleChoiceProblem
 from benchmark.problems.math_expression_problem import MathExpressionResponseProblem, MathExpressionMultipleChoiceProblem
 from benchmark.problems.navigate_problem import NavigateResponseProblem, NavigateMultipleChoiceProblem
 
 problem_classes: list[BaseProblem] = [
-    BooleanExpressionResponseProblem, 
-    BooleanExpressionMultipleChoiceProblem, 
-    DyckLanguageResponseProblem, 
-    DyckLanguageMultipleChoiceProblem, 
-    LiarResponseProblem, 
-    LiarMultipleChoiceProblem, 
-    MathExpressionResponseProblem, 
-    MathExpressionMultipleChoiceProblem, 
-    NavigateResponseProblem, 
-    NavigateMultipleChoiceProblem
+    # BooleanExpressionResponseProblem, 
+    # BooleanExpressionMultipleChoiceProblem, 
+    # DyckLanguageResponseProblem, 
+    # DyckLanguageMultipleChoiceProblem, 
+    # LiarResponseProblem, 
+    # LiarMultipleChoiceProblem, 
+    # LogicalDeductionNPeopleResponseProblem,
+    LogicalDeductionNPeopleMultipleChoiceProblem
+    # MathExpressionResponseProblem, 
+    # MathExpressionMultipleChoiceProblem, 
+    # NavigateResponseProblem, 
+    # NavigateMultipleChoiceProblem
 ]
 
 def generate_benchmark(seed: int | None = None, num_problems: int = 1000, max_problem_types: int = None, num_shots: int = 0) -> dict[str, dict]:
@@ -37,7 +40,7 @@ def generate_benchmark(seed: int | None = None, num_problems: int = 1000, max_pr
     if max_problem_types is not None:
         selected_problem_classes = random.sample(problem_classes, min(max_problem_types, len(problem_classes)))
 
-    for i in range(num_problems):
+    for i in tqdm(range(num_problems)):
         config.increment_seed()
         problem = config.rng.choice(selected_problem_classes)(config=config)
         problem.generate()

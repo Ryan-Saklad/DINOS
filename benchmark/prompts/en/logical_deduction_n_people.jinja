@@ -1,0 +1,9 @@
+{% if ProblemType.RESPONSE in Problem.problem_types %}
+{% set instruction = "Using the logically consistent statements provided below, respond only with the position (1, 2, etc.) of " ~ Problem.unmentioned_person ~ "." %}
+{% include "response_problem.jinja" with context %}
+{% elif ProblemType.MULTIPLE_CHOICE in Problem.problem_types %}
+{% if ProblemType.SOLVE_EXPRESSION in Problem.problem_types %}
+{% set instruction = "Using the logically consistent statements, find the index of the position of " ~ Problem.unmentioned_person ~ ".\n" ~ Problem.problem ~ "\n Respond only with the label corresponding to your choice." %}
+{% endif %}
+{% include "multiple_choice_problem.jinja" with context %}
+{% endif %}

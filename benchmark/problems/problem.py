@@ -9,7 +9,7 @@ from utils.problem_type import ProblemType
 
 
 class BaseProblem(ABC):
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config, **kwargs) -> None:
         super().__init__()
 
         self.config: Config = config
@@ -63,8 +63,8 @@ class BaseProblem(ABC):
 
 
 class ResponseProblem(BaseProblem, ABC):
-    def __init__(self, config: Config) -> None:
-        super().__init__(config)
+    def __init__(self, config: Config, **kwargs) -> None:
+        super().__init__(config, **kwargs)
 
         self.problem_types.append(ProblemType.RESPONSE)
 
@@ -79,8 +79,8 @@ class AlternativeAnswer(Enum):
 
 
 class MultipleChoiceProblem(BaseProblem, ABC):
-    def __init__(self, config: Config) -> None:
-        super().__init__(config)
+    def __init__(self, config: Config, **kwargs) -> None:
+        super().__init__(config, **kwargs)
 
         self.options: dict[str, str] = {}
         self.problem_types.append(ProblemType.MULTIPLE_CHOICE)
