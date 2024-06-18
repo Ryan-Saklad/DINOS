@@ -2,6 +2,10 @@
 {% set instruction = "After following each instruction, where do you end up? Provide your answer as a pair of coordinates (x, y), where you always face forward." %}
 {% include "response_problem.jinja" with context %}
 {% elif ProblemType.MULTIPLE_CHOICE in Problem.problem_types %}
+{% if ProblemType.SOLVE_EXPRESSION in Problem.problem_types %}
+{% set instruction = "If you follow the following instructions and always face forward, where do you end up?\n " ~ Problem.problem ~ "\n Respond only with the label corresponding to your choice." %}
+{% elif ProblemType.CHOOSE_MATCHING_EXPRESSION in Problem.problem_types %}
 {% set instruction = "Select the choice that contains the instructions that lead to the given final coordinates, " ~ Problem._answer ~ ", where you always face forward. Respond only with the label corresponding to your choice." %}
+{% endif %}
 {% include "multiple_choice_problem.jinja" with context %}
 {% endif %}

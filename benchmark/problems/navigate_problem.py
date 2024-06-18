@@ -78,4 +78,14 @@ class NavigateResponseProblem(NavigateProblem, ResponseProblem):
 
 class NavigateMultipleChoiceProblem(NavigateProblem, MultipleChoiceProblem):
     def generate_prompt(self, **kwargs) -> None:
-        super().generate_prompt(ProblemType.CHOOSE_MATCHING_EXPRESSION, **kwargs)
+        if ProblemType.SOLVE_EXPRESSION not in self.problem_types and ProblemType.CHOOSE_MATCHING_EXPRESSION not in self.problem_types:
+            if self.config.rng.choice([True, False]):
+                super().generate_prompt(ProblemType.SOLVE_EXPRESSION, **kwargs)
+            else:
+                super().generate_prompt(ProblemType.CHOOSE_MATCHING_EXPRESSION, **kwargs)
+        elif ProblemType.SOLVE_EXPRESSION in self.problem_types:
+            super().generate_prompt(ProblemType.SOLVE_EXPRESSION, **kwargs)
+        elif ProblemType.CHOOSE_MATCHING_EXPRESSION in self.problem_types:
+            super().generate_prompt(ProblemType.CHOOSE_MATCHING_EXPRESSION, **kwargs)
+        else:
+            raise ValueError("Invalid problem type")
